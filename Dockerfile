@@ -16,4 +16,7 @@
     EXPOSE 8080
 
     # Run app.py when the container launches
-    CMD ["python", "app.py"]
+    #CMD ["python", "app.py"]
+
+
+ENTRYPOINT ["python", "run", "-h", "--host=0.0.0.0", "--port=8080", "app.py"]
