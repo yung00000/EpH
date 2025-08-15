@@ -3,6 +3,48 @@ import re
 
 app = Flask(__name__)
 
+# Translation dictionary for English and Traditional Chinese
+TRANSLATIONS = {
+    'en': {
+        'title': 'EpH Calculator',
+        'mode_label': 'Calculation Mode:',
+        'mode_select': 'Select',
+        'mode_eph': 'Calculate EpH',
+        'mode_time': 'Calculate Estimated Time',
+        'distance_label': 'Distance (km):',
+        'elevation_label': 'Elevation Gain (m):',
+        'time_label': 'Time (hh:mm:ss or hh:mm):',
+        'eph_label': 'EpH Value:',
+        'submit_button': 'Calculate',
+        'language_label': 'Language:',
+        'result_eph': 'EpH = {:.2f}',
+        'result_time': 'Estimated Completion Time = {}',
+        'error_mode': 'Please select a valid calculation mode',
+        'error_invalid': 'Please enter valid values',
+        'error_time_format': 'Invalid time format',
+        'time_placeholder': 'e.g., 3:30:00'
+    },
+    'zh': {
+        'title': 'EpH計算器',
+        'mode_label': '計算模式：',
+        'mode_select': '請選擇',
+        'mode_eph': '計算EpH',
+        'mode_time': '計算預計時間',
+        'distance_label': '距離 (公里)：',
+        'elevation_label': '爬升高度 (米)：',
+        'time_label': '耗時 (hh:mm:ss 或 hh:mm)：',
+        'eph_label': 'EpH值：',
+        'submit_button': '計算',
+        'language_label': '語言：',
+        'result_eph': 'EpH = {:.2f}',
+        'result_time': '預計完成時間 = {}',
+        'error_mode': '請選擇有效的計算模式',
+        'error_invalid': '請輸入有效的數值',
+        'error_time_format': '無效的時間格式',
+        'time_placeholder': '例如：3:30:00'
+    }
+}
+
 def calculate_ep(distance_km, elevation_gain_m):
     """Calculate total Ep value (Effort Points)"""
     return distance_km + elevation_gain_m / 100
@@ -42,6 +84,12 @@ def hours_to_hms(hours_decimal):
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
+    # Get language from query parameter, default to 'zh' (Traditional Chinese)
+    lang = request.args.get('lang', 'zh')
+    if lang not in ['en', 'zh']:
+        lang = 'zh'
+    translations = TRANSLATIONS[lang]
+
     result = None
     error = None
     mode = None
@@ -55,18 +103,18 @@ def index():
             if mode == 'eph':
                 time_str = request.form.get('time')
                 result = calculate_eph(distance, elevation, time_str)
-                result = f"EpH = {result:.2f}"
+                result = translations['result_eph'].format(result)
             elif mode == 'time':
                 eph = float(request.form.get('eph'))
                 result = calculate_time(distance, elevation, eph)
-                result = f"预计完成时间 = {result}"
+                result = translations['result_time'].format(result)
             else:
-                error = "请选择有效的计算模式"
+                error = translations['error_mode']
                 
         except ValueError as e:
-            error = str(e) if "Invalid time format" in str(e) else "请输入有效的数值"
+            error = translations['error_time_format'] if "Invalid time format" in str(e) else translations['error_invalid']
     
-    return render_template('index.html', result=result, error=error, mode=mode)
+    return render_template('index.html', result=result, error=error, mode=mode, translations=translations, lang=lang)
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="{{ 'en' if lang == 'en' else 'zh-TW' }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EpH计算器</title>
+    <title>{{ translations.title }}</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -46,33 +46,42 @@
 </head>
 <body>
     <div class="container">
-        <h1>EpH计算器</h1>
-        <form method="POST">
+        <h1>{{ translations.title }}</h1>
+        <form method="GET" action="/">
             <div class="form-group">
-                <label for="mode">计算模式:</label>
+                <label for="lang">{{ translations.language_label }}</label>
+                <select name="lang" id="lang" onchange="this.form.submit()">
+                    <option value="en" {% if lang == 'en' %}selected{% endif %}>English</option>
+                    <option value="zh" {% if lang == 'zh' %}selected{% endif %}>繁體中文</option>
+                </select>
+            </div>
+        </form>
+        <form method="POST" action="/?lang={{ lang }}">
+            <div class="form-group">
+                <label for="mode">{{ translations.mode_label }}</label>
                 <select name="mode" id="mode" required onchange="toggleFields()">
-                    <option value="">请选择</option>
-                    <option value="eph" {% if mode == 'eph' %}selected{% endif %}>计算EpH</option>
-                    <option value="time" {% if mode == 'time' %}selected{% endif %}>计算预计时间</option>
+                    <option value="">{{ translations.mode_select }}</option>
+                    <option value="eph" {% if mode == 'eph' %}selected{% endif %}>{{ translations.mode_eph }}</option>
+                    <option value="time" {% if mode == 'time' %}selected{% endif %}>{{ translations.mode_time }}</option>
                 </select>
             </div>
             <div class="form-group">
-                <label for="distance">距离 (公里):</label>
-                <input type="number" name="distance" id="distance" step="0.01" required>
+                <label for="distance">{{ translations.distance_label }}</label>
+                <input type="number" name="distance" id="distance" step="0.001" required>
             </div>
             <div class="form-group">
-                <label for="elevation">爬升高度 (米):</label>
+                <label for="elevation">{{ translations.elevation_label }}</label>
                 <input type="number" name="elevation" id="elevation" step="0.01" required>
             </div>
             <div class="form-group" id="time-field">
-                <label for="time">耗时 (hh:mm:ss 或 hh:mm):</label>
-                <input type="text" name="time" id="time" placeholder="例如: 3:30:00">
+                <label for="time">{{ translations.time_label }}</label>
+                <input type="text" name="time" id="time" placeholder="{{ translations.time_placeholder }}">
             </div>
             <div class="form-group" id="eph-field" style="display: none;">
-                <label for="eph">EpH值:</label>
+                <label for="eph">{{ translations.eph_label }}</label>
                 <input type="number" name="eph" id="eph" step="0.01">
             </div>
-            <button type="submit">计算</button>
+            <button type="submit">{{ translations.submit_button }}</button>
         </form>
         {% if result %}
         <div class="result">{{ result }}</div>
@@ -89,6 +98,8 @@
             document.getElementById('time').required = mode === 'eph';
             document.getElementById('eph').required = mode === 'time';
         }
+        // Ensure fields are toggled correctly on page load
+        toggleFields();
     </script>
 </body>
 </html>
