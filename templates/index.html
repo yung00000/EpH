@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EpH计算器</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .container {
+            text-align: center;
+        }
+        .form-group {
+            margin: 15px 0;
+        }
+        label {
+            display: inline-block;
+            width: 150px;
+        }
+        input, select {
+            padding: 5px;
+            width: 200px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .result, .error {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>EpH计算器</h1>
+        <form method="POST">
+            <div class="form-group">
+                <label for="mode">计算模式:</label>
+                <select name="mode" id="mode" required onchange="toggleFields()">
+                    <option value="">请选择</option>
+                    <option value="eph" {% if mode == 'eph' %}selected{% endif %}>计算EpH</option>
+                    <option value="time" {% if mode == 'time' %}selected{% endif %}>计算预计时间</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="distance">距离 (公里):</label>
+                <input type="number" name="distance" id="distance" step="0.01" required>
+            </div>
+            <div class="form-group">
+                <label for="elevation">爬升高度 (米):</label>
+                <input type="number" name="elevation" id="elevation" step="0.01" required>
+            </div>
+            <div class="form-group" id="time-field">
+                <label for="time">耗时 (hh:mm:ss 或 hh:mm):</label>
+                <input type="text" name="time" id="time" placeholder="例如: 3:30:00">
+            </div>
+            <div class="form-group" id="eph-field" style="display: none;">
+                <label for="eph">EpH值:</label>
+                <input type="number" name="eph" id="eph" step="0.01">
+            </div>
+            <button type="submit">计算</button>
+        </form>
+        {% if result %}
+        <div class="result">{{ result }}</div>
+        {% endif %}
+        {% if error %}
+        <div class="error">{{ error }}</div>
+        {% endif %}
+    </div>
+    <script>
+        function toggleFields() {
+            const mode = document.getElementById('mode').value;
+            document.getElementById('time-field').style.display = mode === 'eph' ? 'block' : 'none';
+            document.getElementById('eph-field').style.display = mode === 'time' ? 'block' : 'none';
+            document.getElementById('time').required = mode === 'eph';
+            document.getElementById('eph').required = mode === 'time';
+        }
+    </script>
+</body>
+</html>
