@@ -4,43 +4,173 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ translations.title }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Roboto+Mono:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary-color: #0f1923;
+            --secondary-color: #1e2d3d;
+            --accent-color: #00d8ff;
+            --text-color: #e0e0e0;
+            --highlight-color: #7df9ff;
+            --error-color: #ff3860;
+        }
+        
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Roboto Mono', monospace;
+            background-color: var(--primary-color);
+            color: var(--text-color);
             max-width: 600px;
             margin: 0 auto;
             padding: 20px;
+            background-image: 
+                radial-gradient(circle at 25% 25%, rgba(0, 216, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(125, 249, 255, 0.1) 0%, transparent 50%);
         }
+        
         .container {
             text-align: center;
+            padding: 30px;
+            background-color: rgba(15, 25, 35, 0.8);
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 216, 255, 0.2);
+            border: 1px solid rgba(0, 216, 255, 0.1);
+            position: relative;
+            overflow: hidden;
         }
+        
+        .container::before {
+            content: "";
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            z-index: -1;
+            background: linear-gradient(45deg, var(--accent-color), var(--highlight-color), var(--accent-color));
+            background-size: 200% 200%;
+            animation: gradient 8s ease infinite;
+            border-radius: 10px;
+            opacity: 0.3;
+        }
+        
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--highlight-color);
+            text-shadow: 0 0 10px rgba(125, 249, 255, 0.5);
+            margin-bottom: 30px;
+            letter-spacing: 1px;
+            font-weight: 500;
+        }
+        
         .form-group {
-            margin: 15px 0;
+            margin: 20px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
+        
         label {
             display: inline-block;
             width: 150px;
+            text-align: right;
+            margin-right: 15px;
+            color: var(--highlight-color);
+            font-weight: 300;
         }
+        
         input, select {
-            padding: 5px;
+            padding: 10px;
             width: 200px;
+            background-color: var(--secondary-color);
+            border: 1px solid rgba(0, 216, 255, 0.3);
+            color: var(--text-color);
+            font-family: 'Roboto Mono', monospace;
+            border-radius: 4px;
+            transition: all 0.3s ease;
         }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 10px rgba(0, 216, 255, 0.3);
+        }
+        
+        input::placeholder {
+            color: #6b7c8d;
+        }
+        
         button {
-            padding: 10px 20px;
-            background-color: #007BFF;
-            color: white;
+            padding: 12px 30px;
+            background: linear-gradient(135deg, var(--accent-color), var(--highlight-color));
+            color: var(--primary-color);
             border: none;
             cursor: pointer;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-        .result, .error {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 500;
+            letter-spacing: 1px;
+            border-radius: 4px;
             margin-top: 20px;
-            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(0, 216, 255, 0.3);
+            text-transform: uppercase;
+            font-size: 0.9em;
         }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 20px rgba(0, 216, 255, 0.5);
+        }
+        
+        .result, .error {
+            margin-top: 30px;
+            padding: 15px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-family: 'Roboto Mono', monospace;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .result {
+            background-color: rgba(0, 216, 255, 0.1);
+            border: 1px solid var(--accent-color);
+            color: var(--highlight-color);
+            text-shadow: 0 0 5px rgba(125, 249, 255, 0.3);
+        }
+        
         .error {
-            color: red;
+            background-color: rgba(255, 56, 96, 0.1);
+            border: 1px solid var(--error-color);
+            color: var(--error-color);
+        }
+        
+        .glow {
+            text-shadow: 0 0 8px currentColor;
+        }
+        
+        .mode-selector {
+            position: relative;
+            margin-bottom: 30px;
+        }
+        
+        .mode-selector::after {
+            content: "▼";
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--accent-color);
+            pointer-events: none;
         }
     </style>
 </head>
@@ -50,20 +180,24 @@
         <form method="GET" action="/">
             <div class="form-group">
                 <label for="lang">{{ translations.language_label }}</label>
-                <select name="lang" id="lang" onchange="this.form.submit()">
-                    <option value="en" {% if lang == 'en' %}selected{% endif %}>English</option>
-                    <option value="zh" {% if lang == 'zh' %}selected{% endif %}>繁體中文</option>
-                </select>
+                <div class="mode-selector">
+                    <select name="lang" id="lang" onchange="this.form.submit()">
+                        <option value="en" {% if lang == 'en' %}selected{% endif %}>English</option>
+                        <option value="zh" {% if lang == 'zh' %}selected{% endif %}>繁體中文</option>
+                    </select>
+                </div>
             </div>
         </form>
         <form method="POST" action="/?lang={{ lang }}">
             <div class="form-group">
                 <label for="mode">{{ translations.mode_label }}</label>
-                <select name="mode" id="mode" required onchange="toggleFields()">
-                    <option value="">{{ translations.mode_select }}</option>
-                    <option value="eph" {% if mode == 'eph' %}selected{% endif %}>{{ translations.mode_eph }}</option>
-                    <option value="time" {% if mode == 'time' %}selected{% endif %}>{{ translations.mode_time }}</option>
-                </select>
+                <div class="mode-selector">
+                    <select name="mode" id="mode" required onchange="toggleFields()">
+                        <option value="">{{ translations.mode_select }}</option>
+                        <option value="eph" {% if mode == 'eph' %}selected{% endif %}>{{ translations.mode_eph }}</option>
+                        <option value="time" {% if mode == 'time' %}selected{% endif %}>{{ translations.mode_time }}</option>
+                    </select>
+                </div>
             </div>
             <div class="form-group">
                 <label for="distance">{{ translations.distance_label }}</label>
@@ -84,7 +218,7 @@
             <button type="submit">{{ translations.submit_button }}</button>
         </form>
         {% if result %}
-        <div class="result">{{ result }}</div>
+        <div class="result glow">{{ result }}</div>
         {% endif %}
         {% if error %}
         <div class="error">{{ error }}</div>
@@ -99,7 +233,20 @@
             document.getElementById('eph').required = mode === 'time';
         }
         // Ensure fields are toggled correctly on page load
-        toggleFields();
+        document.addEventListener('DOMContentLoaded', function() {
+            toggleFields();
+            
+            // Add animation to inputs when focused
+            const inputs = document.querySelectorAll('input, select');
+            inputs.forEach(input => {
+                input.addEventListener('focus', function() {
+                    this.style.boxShadow = '0 0 15px rgba(0, 216, 255, 0.5)';
+                });
+                input.addEventListener('blur', function() {
+                    this.style.boxShadow = 'none';
+                });
+            });
+        });
     </script>
 </body>
 </html>
