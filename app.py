@@ -115,6 +115,3 @@ def index():
             error = translations['error_time_format'] if "Invalid time format" in str(e) else translations['error_invalid']
     
     return render_template('index.html', result=result, error=error, mode=mode, translations=translations, lang=lang)
-
-if __name__ == '__main__':
-    app.run(debug=True)
