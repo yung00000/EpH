@@ -1,42 +1,26 @@
- FROM python:3.13.3-slim-bookworm
+# 使用官方 Python 輕量級映像
+FROM python:3.13.3-slim-bookworm
 
- # Set working directory
- WORKDIR /app
+# 設置工作目錄
+WORKDIR /app
 
- # Copy requirements file
- COPY requirements.txt .
+# 複製依賴文件
+COPY requirements.txt .
 
- # Install dependencies
- RUN pip install --no-cache-dir -r requirements.txt
+# 安裝依賴
+RUN pip install --no-cache-dir -r requirements.txt
 
- # Copy the rest of the application
- COPY . .
+# 複製所有應用文件
+COPY . .
 
- # Make port 8080 available to the world outside this container
- EXPOSE 8080
+# 暴露端口 8080
+EXPOSE 8080
 
-    # Run app.py when the container launches
-   # CMD ["python", "-h" ,"--host=0.0.0.0","--port=8080","app.py"
-   CMD ["gunicorn", "--bind", "0.0.0.0:8080", "app:app"]
+# 設置環境變量
+ENV FLASK_APP=app.py
+ENV FLASK_RUN_HOST=0.0.0.0
+ENV FLASK_RUN_PORT=8080
+#ENV FLASK_DEBUG=false  # 生產環境關閉調試模式
 
-# Use the official Python slim image for a smaller footprint
-#FROM python:3.12-slim
-
-# Set working directory in the container
-#WORKDIR /app
-
-# Copy the requirements file (if you have one) and install dependencies
-#COPY requirements.txt .
-#RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy the application code
-#COPY app.py .
-
-# Set environment variables for Cloud Run
-#ENV PORT=8080
-
-# Expose the port Cloud Run expects
-#EXPOSE 8080
-
-# Command to run the application
-#CMD exec python app.py
+# 啟動命令
+CMD ["python", "app.py"]

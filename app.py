@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request
 import re
+import os
 
 app = Flask(__name__)
 
@@ -115,3 +116,11 @@ def index():
             error = translations['error_time_format'] if "Invalid time format" in str(e) else translations['error_invalid']
     
     return render_template('index.html', result=result, error=error, mode=mode, translations=translations, lang=lang)
+
+if __name__ == '__main__':
+    # 使用環境變量設置端口和主機，默認值為 8080 和 0.0.0.0
+    port = int(os.environ.get('FLASK_RUN_PORT', 8080))
+    host = os.environ.get('FLASK_RUN_HOST', '0.0.0.0')
+    # 生產環境關閉調試模式
+    debug = os.environ.get('FLASK_DEBUG', 'false').lower() == 'true'
+    app.run(host=host, port=port, debug=debug)
