@@ -5,9 +5,10 @@
     WORKDIR /app
 
     # Copy the current directory contents into the container at /app
-    COPY . /app
+    COPY requirements.txt ./
+    COPY app.py ./
 
-    COPY . /templates/index
+    COPY templates/index.html ./
 
     # Install any needed packages specified in requirements.txt
     RUN pip install --no-cache-dir -r requirements.txt
@@ -16,7 +17,7 @@
     EXPOSE 8080
 
     # Run app.py when the container launches
-    #CMD ["python", "app.py"]
+    CMD ["python", "-h" ,"--host=0.0.0.0","--port=8080","app.py"]
 
 
 # Use the official Python slim image for a smaller footprint
@@ -39,4 +40,4 @@
 #EXPOSE 8080
 
 # Command to run the application
-CMD exec python app.py
+#CMD exec python app.py
