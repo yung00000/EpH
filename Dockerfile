@@ -18,7 +18,7 @@
 
     # Run app.py when the container launches
    # CMD ["python", "-h" ,"--host=0.0.0.0","--port=8080","app.py"]
-    CMD ["python",,"appy.py"]
+    CMD ["python","appy.py"]
 
 # Use the official Python slim image for a smaller footprint
 #FROM python:3.12-slim
