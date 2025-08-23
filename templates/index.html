@@ -37,7 +37,7 @@
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 800px;
             margin: 0 auto;
             padding: 2rem;
         }
@@ -61,37 +61,31 @@
             margin: 0 auto;
         }
 
-        .main-content {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 3rem;
-            margin-bottom: 3rem;
-        }
-
         .calculator-card {
             background: var(--card-background);
             border-radius: 16px;
-            padding: 2rem;
+            padding: 2.5rem;
             box-shadow: var(--shadow);
             border: 1px solid var(--border-color);
+            margin-bottom: 2rem;
         }
 
         .card-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
             border-bottom: 2px solid var(--border-color);
         }
 
         .card-header i {
-            font-size: 1.5rem;
+            font-size: 2rem;
             color: var(--primary-color);
-            margin-right: 0.75rem;
+            margin-bottom: 1rem;
+            display: block;
         }
 
         .card-header h2 {
-            font-size: 1.25rem;
+            font-size: 1.5rem;
             font-weight: 600;
             color: var(--text-primary);
         }
@@ -309,14 +303,21 @@
             display: none;
         }
 
+        .conditional-field {
+            display: none;
+        }
+
+        .conditional-field.show {
+            display: block;
+        }
+
         @media (max-width: 768px) {
             .container {
                 padding: 1rem;
             }
             
-            .main-content {
-                grid-template-columns: 1fr;
-                gap: 2rem;
+            .calculator-card {
+                padding: 1.5rem;
             }
             
             .header h1 {
@@ -375,72 +376,56 @@
             <p>{{ 'Professional EpH calculator for running and cycling performance analysis' if lang == 'en' else '專業的EpH計算器，用於跑步和騎行表現分析' }}</p>
         </div>
 
-        <div class="main-content">
-            <!-- EpH Calculation Card -->
-            <div class="calculator-card">
-                <div class="card-header">
-                    <i class="fas fa-calculator"></i>
-                    <h2>{{ translations.mode_eph }}</h2>
+        <!-- Main Calculator Card -->
+        <div class="calculator-card">
+            <div class="card-header">
+                <i class="fas fa-calculator"></i>
+                <h2>{{ 'EpH Calculator' if lang == 'en' else 'EpH計算器' }}</h2>
+            </div>
+            
+            <form id="calculatorForm">
+                <div class="form-group">
+                    <label class="form-label">{{ translations.mode_label }}</label>
+                    <select class="form-select" id="calculationMode" required onchange="toggleFields()">
+                        <option value="">{{ translations.mode_select }}</option>
+                        <option value="eph">{{ translations.mode_eph }}</option>
+                        <option value="time">{{ translations.mode_time }}</option>
+                    </select>
                 </div>
                 
-                <form id="ephForm" class="eph-form">
-                    <div class="form-group">
-                        <label class="form-label">{{ translations.distance_label }}</label>
-                        <input type="number" class="form-input" id="ephDistance" step="0.1" min="0" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">{{ translations.elevation_label }}</label>
-                        <input type="number" class="form-input" id="ephElevation" step="1" min="0" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">
-                            {{ translations.time_label }}
-                            <span class="info-tooltip">
-                                <i class="fas fa-info-circle"></i>
-                                <span class="tooltip-text">{{ 'Enter time in format: hh:mm:ss or hh:mm (e.g., 2:30:00 or 2:30)' if lang == 'en' else '請輸入時間格式：hh:mm:ss 或 hh:mm（例如：2:30:00 或 2:30）' }}</span>
-                            </span>
-                        </label>
-                        <input type="text" class="form-input" id="ephTime" placeholder="{{ translations.time_placeholder }}" required>
-                    </div>
-                    
-                    <button type="submit" class="btn btn-primary btn-full">
-                        <i class="fas fa-play"></i>
-                        {{ translations.submit_button }}
-                    </button>
-                </form>
-            </div>
-
-            <!-- Time Calculation Card -->
-            <div class="calculator-card">
-                <div class="card-header">
-                    <i class="fas fa-clock"></i>
-                    <h2>{{ translations.mode_time }}</h2>
+                <div class="form-group">
+                    <label class="form-label">{{ translations.distance_label }}</label>
+                    <input type="number" class="form-input" id="distance" step="0.1" min="0" required>
                 </div>
                 
-                <form id="timeForm" class="time-form">
-                    <div class="form-group">
-                        <label class="form-label">{{ translations.distance_label }}</label>
-                        <input type="number" class="form-input" id="timeDistance" step="0.1" min="0" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">{{ translations.elevation_label }}</label>
-                        <input type="number" class="form-input" id="timeElevation" step="1" min="0" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">{{ translations.eph_label }}</label>
-                        <input type="number" class="form-input" id="timeEph" step="0.01" min="0" required>
-                    </div>
-                    
-                    <button type="submit" class="btn btn-primary btn-full">
-                        <i class="fas fa-play"></i>
-                        {{ translations.submit_button }}
-                    </button>
-                </form>
-            </div>
+                <div class="form-group">
+                    <label class="form-label">{{ translations.elevation_label }}</label>
+                    <input type="number" class="form-input" id="elevation" step="1" min="0" required>
+                </div>
+                
+                <!-- Time field (shown when calculating EpH) -->
+                <div class="form-group conditional-field" id="timeField">
+                    <label class="form-label">
+                        {{ translations.time_label }}
+                        <span class="info-tooltip">
+                            <i class="fas fa-info-circle"></i>
+                            <span class="tooltip-text">{{ 'Enter time in format: hh:mm:ss or hh:mm (e.g., 2:30:00 or 2:30)' if lang == 'en' else '請輸入時間格式：hh:mm:ss 或 hh:mm（例如：2:30:00 或 2:30）' }}</span>
+                        </span>
+                    </label>
+                    <input type="text" class="form-input" id="time" placeholder="{{ translations.time_placeholder }}">
+                </div>
+                
+                <!-- EpH field (shown when calculating time) -->
+                <div class="form-group conditional-field" id="ephField">
+                    <label class="form-label">{{ translations.eph_label }}</label>
+                    <input type="number" class="form-input" id="eph" step="0.01" min="0">
+                </div>
+                
+                <button type="submit" class="btn btn-primary btn-full">
+                    <i class="fas fa-play"></i>
+                    {{ translations.submit_button }}
+                </button>
+            </form>
         </div>
 
         <!-- Results Section -->
@@ -476,65 +461,65 @@
             window.location.href = `/?lang=${lang}`;
         }
 
-        // Form submission handlers
-        document.getElementById('ephForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            await calculateEpH();
-        });
-
-        document.getElementById('timeForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            await calculateTime();
-        });
-
-        // EpH calculation
-        async function calculateEpH() {
-            const distance = document.getElementById('ephDistance').value;
-            const elevation = document.getElementById('ephElevation').value;
-            const time = document.getElementById('ephTime').value;
-
-            if (!distance || !elevation || !time) {
-                showError('{{ "Please fill in all fields" if lang == "en" else "請填寫所有欄位" }}');
-                return;
-            }
-
-            showLoading(true);
+        // Toggle conditional fields based on calculation mode
+        function toggleFields() {
+            const mode = document.getElementById('calculationMode').value;
+            const timeField = document.getElementById('timeField');
+            const ephField = document.getElementById('ephField');
+            const timeInput = document.getElementById('time');
+            const ephInput = document.getElementById('eph');
             
-            try {
-                const formData = new FormData();
-                formData.append('mode', 'eph');
-                formData.append('distance', distance);
-                formData.append('elevation', elevation);
-                formData.append('time', time);
-
-                const response = await fetch('/calculate', {
-                    method: 'POST',
-                    body: formData
-                });
-
-                const result = await response.json();
-                
-                if (result.error) {
-                    showError(result.error);
-                } else {
-                    showResult(result.result);
-                    saveFormData('eph', distance, elevation, time, '', result.result);
-                }
-            } catch (error) {
-                showError('{{ "An error occurred. Please try again." if lang == "en" else "發生錯誤，請重試。" }}');
-            } finally {
-                showLoading(false);
+            // Hide both fields initially
+            timeField.classList.remove('show');
+            ephField.classList.remove('show');
+            
+            // Clear values
+            timeInput.value = '';
+            ephInput.value = '';
+            
+            // Show appropriate field based on mode
+            if (mode === 'eph') {
+                timeField.classList.add('show');
+                timeInput.required = true;
+                ephInput.required = false;
+            } else if (mode === 'time') {
+                ephField.classList.add('show');
+                ephInput.required = true;
+                timeInput.required = false;
             }
         }
 
-        // Time calculation
-        async function calculateTime() {
-            const distance = document.getElementById('timeDistance').value;
-            const elevation = document.getElementById('timeElevation').value;
-            const eph = document.getElementById('timeEph').value;
+        // Form submission handler
+        document.getElementById('calculatorForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            await calculate();
+        });
 
-            if (!distance || !elevation || !eph) {
-                showError('{{ "Please fill in all fields" if lang == "en" else "請填寫所有欄位" }}');
+        // Main calculation function
+        async function calculate() {
+            const mode = document.getElementById('calculationMode').value;
+            const distance = document.getElementById('distance').value;
+            const elevation = document.getElementById('elevation').value;
+            const time = document.getElementById('time').value;
+            const eph = document.getElementById('eph').value;
+
+            if (!mode) {
+                showError('{{ "Please select a calculation mode" if lang == "en" else "請選擇計算模式" }}');
+                return;
+            }
+
+            if (!distance || !elevation) {
+                showError('{{ "Please fill in distance and elevation" if lang == "en" else "請填寫距離和海拔" }}');
+                return;
+            }
+
+            if (mode === 'eph' && !time) {
+                showError('{{ "Please enter time for EpH calculation" if lang == "en" else "請輸入時間以計算EpH" }}');
+                return;
+            }
+
+            if (mode === 'time' && !eph) {
+                showError('{{ "Please enter EpH value for time calculation" if lang == "en" else "請輸入EpH值以計算時間" }}');
                 return;
             }
 
@@ -542,10 +527,15 @@
             
             try {
                 const formData = new FormData();
-                formData.append('mode', 'time');
+                formData.append('mode', mode);
                 formData.append('distance', distance);
                 formData.append('elevation', elevation);
-                formData.append('eph', eph);
+                
+                if (mode === 'eph') {
+                    formData.append('time', time);
+                } else {
+                    formData.append('eph', eph);
+                }
 
                 const response = await fetch('/calculate', {
                     method: 'POST',
@@ -558,7 +548,12 @@
                     showError(result.error);
                 } else {
                     showResult(result.result);
-                    saveFormData('time', distance, elevation, '', eph, result.result);
+                    // Save to history
+                    if (mode === 'eph') {
+                        saveFormData(mode, distance, elevation, time, '', result.result);
+                    } else {
+                        saveFormData(mode, distance, elevation, '', eph, result.result);
+                    }
                 }
             } catch (error) {
                 showError('{{ "An error occurred. Please try again." if lang == "en" else "發生錯誤，請重試。" }}');
@@ -654,15 +649,17 @@
         }
 
         function fillFormWithHistory(item) {
+            document.getElementById('calculationMode').value = item.mode;
+            document.getElementById('distance').value = item.distance;
+            document.getElementById('elevation').value = item.elevation;
+            
             if (item.mode === 'eph') {
-                document.getElementById('ephDistance').value = item.distance;
-                document.getElementById('ephElevation').value = item.elevation;
-                document.getElementById('ephTime').value = item.time;
+                document.getElementById('time').value = item.time;
             } else {
-                document.getElementById('timeDistance').value = item.distance;
-                document.getElementById('timeElevation').value = item.elevation;
-                document.getElementById('timeEph').value = item.eph;
+                document.getElementById('eph').value = item.eph;
             }
+            
+            toggleFields();
         }
 
         function clearHistory() {
