@@ -1,8 +1,21 @@
-from flask import Flask, render_template, request
+from fastapi import FastAPI, Request, Form, Query
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+from pydantic import BaseModel
+from typing import Optional
 import re
 import os
+import uvicorn
 
-app = Flask(__name__)
+app = FastAPI(
+    title="EpH Calculator",
+    description="A professional EpH (Effort Points per Hour) calculator for running and cycling",
+    version="1.0.0"
+)
+
+# Mount static files and templates
+templates = Jinja2Templates(directory="templates")
 
 # Translation dictionary for English and Traditional Chinese
 TRANSLATIONS = {
@@ -46,23 +59,35 @@ TRANSLATIONS = {
     }
 }
 
-def calculate_ep(distance_km, elevation_gain_m):
+# Pydantic models for request validation
+class EpHRequest(BaseModel):
+    mode: str
+    distance: float
+    elevation: float
+    time: Optional[str] = None
+    eph: Optional[float] = None
+
+class EpHResponse(BaseModel):
+    result: str
+    error: Optional[str] = None
+
+def calculate_ep(distance_km: float, elevation_gain_m: float) -> float:
     """Calculate total Ep value (Effort Points)"""
     return distance_km + elevation_gain_m / 100
 
-def calculate_eph(distance_km, elevation_gain_m, time_str):
+def calculate_eph(distance_km: float, elevation_gain_m: float, time_str: str) -> float:
     """Calculate EpH (Effort Points per Hour)"""
     hours = hms_to_hours(time_str)
     total_ep = calculate_ep(distance_km, elevation_gain_m)
     return total_ep / hours
 
-def calculate_time(distance_km, elevation_gain_m, eph):
+def calculate_time(distance_km: float, elevation_gain_m: float, eph: float) -> str:
     """Calculate estimated completion time and return in hh:mm:ss format"""
     total_ep = calculate_ep(distance_km, elevation_gain_m)
     hours_decimal = total_ep / eph
     return hours_to_hms(hours_decimal)
 
-def hms_to_hours(time_str):
+def hms_to_hours(time_str: str) -> float:
     """Convert hh:mm:ss or hh:mm format to hours (decimal)"""
     pattern = r'^(\d+)(?::(\d{1,2}))?(?::(\d{1,2}))?$'
     match = re.match(pattern, time_str.strip())
@@ -75,7 +100,7 @@ def hms_to_hours(time_str):
     
     return hours + minutes/60 + seconds/3600
 
-def hours_to_hms(hours_decimal):
+def hours_to_hms(hours_decimal: float) -> str:
     """Convert hours (decimal) to hh:mm:ss format"""
     total_seconds = int(round(hours_decimal * 3600))
     hours = total_seconds // 3600
@@ -83,44 +108,55 @@ def hours_to_hms(hours_decimal):
     seconds = total_seconds % 60
     return f"{hours:02d}:{minutes:02d}:{seconds:02d}"
 
-@app.route('/', methods=['GET', 'POST'])
-def index():
-    # Get language from query parameter, default to 'zh' (Traditional Chinese)
-    lang = request.args.get('lang', 'zh')
+@app.get("/", response_class=HTMLResponse)
+async def index(request: Request, lang: str = Query("zh", description="Language preference")):
+    """Main page endpoint"""
     if lang not in ['en', 'zh']:
         lang = 'zh'
     translations = TRANSLATIONS[lang]
-
-    result = None
-    error = None
-    mode = None
     
-    if request.method == 'POST':
-        mode = request.form.get('mode')
-        try:
-            distance = float(request.form.get('distance'))
-            elevation = float(request.form.get('elevation'))
-            
-            if mode == 'eph':
-                time_str = request.form.get('time')
-                result = calculate_eph(distance, elevation, time_str)
-                result = translations['result_eph'].format(result)
-            elif mode == 'time':
-                eph = float(request.form.get('eph'))
-                result = calculate_time(distance, elevation, eph)
-                result = translations['result_time'].format(result)
-            else:
-                error = translations['error_mode']
-                
-        except ValueError as e:
-            error = translations['error_time_format'] if "Invalid time format" in str(e) else translations['error_invalid']
-    
-    return render_template('index.html', result=result, error=error, mode=mode, translations=translations, lang=lang)
+    return templates.TemplateResponse(
+        "index.html", 
+        {"request": request, "translations": translations, "lang": lang}
+    )
 
-if __name__ == '__main__':
-    # 使用環境變量設置端口和主機，默認值為 8080 和 0.0.0.0
-    port = int(os.environ.get('FLASK_RUN_PORT', 8080))
-    host = os.environ.get('FLASK_RUN_HOST', '0.0.0.0')
-    # 生產環境關閉調試模式
-    debug = os.environ.get('FLASK_DEBUG', 'false').lower() == 'true'
-    app.run(host=host, port=port, debug=debug)
+@app.post("/calculate", response_model=EpHResponse)
+async def calculate(request: Request, mode: str = Form(...), distance: float = Form(...), 
+                   elevation: float = Form(...), time: Optional[str] = Form(None), 
+                   eph: Optional[float] = Form(None)):
+    """Calculate EpH or estimated time based on input parameters"""
+    try:
+        if mode == 'eph':
+            if not time:
+                return EpHResponse(result="", error="Time is required for EpH calculation")
+            result = calculate_eph(distance, elevation, time)
+            return EpHResponse(result=f"EpH = {result:.2f}")
+        elif mode == 'time':
+            if not eph:
+                return EpHResponse(result="", error="EpH value is required for time calculation")
+            result = calculate_time(distance, elevation, eph)
+            return EpHResponse(result=f"Estimated Completion Time = {result}")
+        else:
+            return EpHResponse(result="", error="Invalid calculation mode")
+    except ValueError as e:
+        if "Invalid time format" in str(e):
+            return EpHResponse(result="", error="Invalid time format")
+        return EpHResponse(result="", error="Please enter valid values")
+
+@app.get("/health")
+async def health_check():
+    """Health check endpoint"""
+    return {"status": "healthy", "service": "EpH Calculator"}
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 8080))
+    host = os.environ.get("HOST", "0.0.0.0")
+    debug = os.environ.get("DEBUG", "false").lower() == "true"
+    
+    uvicorn.run(
+        "app:app",
+        host=host,
+        port=port,
+        reload=debug,
+        log_level="info"
+    )

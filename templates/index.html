@@ -4,248 +4,677 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ translations.title }}</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Roboto+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
-            --primary-color: #0f1923;
-            --secondary-color: #1e2d3d;
-            --accent-color: #00d8ff;
-            --text-color: #e0e0e0;
-            --highlight-color: #7df9ff;
-            --error-color: #ff3860;
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --secondary-color: #64748b;
+            --accent-color: #10b981;
+            --background-color: #f8fafc;
+            --card-background: #ffffff;
+            --border-color: #e2e8f0;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --error-color: #ef4444;
+            --success-color: #10b981;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         }
-        
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: 'Roboto Mono', monospace;
-            background-color: var(--primary-color);
-            color: var(--text-color);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--background-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
             max-width: 600px;
             margin: 0 auto;
-            padding: 20px;
-            background-image: 
-                radial-gradient(circle at 25% 25%, rgba(0, 216, 255, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 75% 75%, rgba(125, 249, 255, 0.1) 0%, transparent 50%);
         }
-        
-        .container {
-            text-align: center;
-            padding: 30px;
-            background-color: rgba(15, 25, 35, 0.8);
-            border-radius: 8px;
-            box-shadow: 0 0 20px rgba(0, 216, 255, 0.2);
-            border: 1px solid rgba(0, 216, 255, 0.1);
-            position: relative;
-            overflow: hidden;
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            margin-bottom: 3rem;
         }
-        
-        .container::before {
-            content: "";
-            position: absolute;
-            top: -2px;
-            left: -2px;
-            right: -2px;
-            bottom: -2px;
-            z-index: -1;
-            background: linear-gradient(45deg, var(--accent-color), var(--highlight-color), var(--accent-color));
-            background-size: 200% 200%;
-            animation: gradient 8s ease infinite;
-            border-radius: 10px;
-            opacity: 0.3;
+
+        .calculator-card {
+            background: var(--card-background);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
         }
-        
-        @keyframes gradient {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-        
-        h1 {
-            font-family: 'Orbitron', sans-serif;
-            color: var(--highlight-color);
-            text-shadow: 0 0 10px rgba(125, 249, 255, 0.5);
-            margin-bottom: 30px;
-            letter-spacing: 1px;
-            font-weight: 500;
-        }
-        
-        .form-group {
-            margin: 20px 0;
+
+        .card-header {
             display: flex;
             align-items: center;
-            justify-content: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--border-color);
         }
-        
-        label {
-            display: inline-block;
-            width: 150px;
-            text-align: right;
-            margin-right: 15px;
-            color: var(--highlight-color);
-            font-weight: 300;
-        }
-        
-        input, select {
-            padding: 10px;
-            width: 200px;
-            background-color: var(--secondary-color);
-            border: 1px solid rgba(0, 216, 255, 0.3);
-            color: var(--text-color);
-            font-family: 'Roboto Mono', monospace;
-            border-radius: 4px;
-            transition: all 0.3s ease;
-        }
-        
-        input:focus, select:focus {
-            outline: none;
-            border-color: var(--accent-color);
-            box-shadow: 0 0 10px rgba(0, 216, 255, 0.3);
-        }
-        
-        input::placeholder {
-            color: #6b7c8d;
-        }
-        
-        button {
-            padding: 12px 30px;
-            background: linear-gradient(135deg, var(--accent-color), var(--highlight-color));
+
+        .card-header i {
+            font-size: 1.5rem;
             color: var(--primary-color);
-            border: none;
-            cursor: pointer;
-            font-family: 'Orbitron', sans-serif;
+            margin-right: 0.75rem;
+        }
+
+        .card-header h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
             font-weight: 500;
-            letter-spacing: 1px;
-            border-radius: 4px;
-            margin-top: 20px;
-            transition: all 0.3s ease;
-            box-shadow: 0 0 15px rgba(0, 216, 255, 0.3);
-            text-transform: uppercase;
-            font-size: 0.9em;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
         }
-        
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 0 20px rgba(0, 216, 255, 0.5);
+
+        .form-select, .form-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+            background: var(--card-background);
         }
-        
-        .result, .error {
-            margin-top: 30px;
-            padding: 15px;
-            border-radius: 4px;
-            font-weight: bold;
-            font-family: 'Roboto Mono', monospace;
-            animation: fadeIn 0.5s ease;
+
+        .form-select:focus, .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
         }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+
+        .form-select {
+            cursor: pointer;
         }
-        
-        .result {
-            background-color: rgba(0, 216, 255, 0.1);
-            border: 1px solid var(--accent-color);
-            color: var(--highlight-color);
-            text-shadow: 0 0 5px rgba(125, 249, 255, 0.3);
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            gap: 0.5rem;
         }
-        
-        .error {
-            background-color: rgba(255, 56, 96, 0.1);
-            border: 1px solid var(--error-color);
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-secondary {
+            background: var(--secondary-color);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #475569;
+            transform: translateY(-1px);
+        }
+
+        .btn-full {
+            width: 100%;
+        }
+
+        .language-switcher {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            z-index: 1000;
+        }
+
+        .language-btn {
+            background: var(--card-background);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .language-btn:hover {
+            border-color: var(--primary-color);
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .language-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .result-section {
+            background: var(--card-background);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+            margin-bottom: 2rem;
+        }
+
+        .result-content {
+            text-align: center;
+        }
+
+        .result-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--success-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .error-message {
             color: var(--error-color);
+            font-weight: 500;
+            text-align: center;
         }
-        
-        .glow {
-            text-shadow: 0 0 8px currentColor;
+
+        .history-section {
+            background: var(--card-background);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
         }
-        
-        .mode-selector {
+
+        .history-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: var(--background-color);
+        }
+
+        .history-item:hover {
+            border-color: var(--primary-color);
+            transform: translateX(4px);
+            box-shadow: var(--shadow);
+        }
+
+        .history-mode {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .history-mode.eph {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success-color);
+        }
+
+        .history-mode.time {
+            background: rgba(37, 99, 235, 0.1);
+            color: var(--primary-color);
+        }
+
+        .history-timestamp {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 1rem;
+        }
+
+        .spinner {
+            border: 3px solid var(--border-color);
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 0.5rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .language-switcher {
+                position: static;
+                text-align: center;
+                margin-bottom: 2rem;
+            }
+        }
+
+        .info-tooltip {
             position: relative;
-            margin-bottom: 30px;
+            display: inline-block;
+            margin-left: 0.5rem;
+            color: var(--text-secondary);
+            cursor: help;
         }
-        
-        .mode-selector::after {
-            content: "▼";
+
+        .info-tooltip .tooltip-text {
+            visibility: hidden;
+            width: 250px;
+            background-color: var(--text-primary);
+            color: white;
+            text-align: center;
+            border-radius: 6px;
+            padding: 0.5rem;
             position: absolute;
-            right: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--accent-color);
-            pointer-events: none;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -125px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.875rem;
+            line-height: 1.4;
+        }
+
+        .info-tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>{{ translations.title }}</h1>
-        <form method="GET" action="/">
-            <div class="form-group">
-                <label for="lang">{{ translations.language_label }}</label>
-                <div class="mode-selector">
-                    <select name="lang" id="lang" onchange="this.form.submit()">
-                        <option value="en" {% if lang == 'en' %}selected{% endif %}>English</option>
-                        <option value="zh" {% if lang == 'zh' %}selected{% endif %}>繁體中文</option>
-                    </select>
-                </div>
-            </div>
-        </form>
-        <form method="POST" action="/?lang={{ lang }}">
-            <div class="form-group">
-                <label for="mode">{{ translations.mode_label }}</label>
-                <div class="mode-selector">
-                    <select name="mode" id="mode" required onchange="toggleFields()">
-                        <option value="">{{ translations.mode_select }}</option>
-                        <option value="eph" {% if mode == 'eph' %}selected{% endif %}>{{ translations.mode_eph }}</option>
-                        <option value="time" {% if mode == 'time' %}selected{% endif %}>{{ translations.mode_time }}</option>
-                    </select>
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="distance">{{ translations.distance_label }}</label>
-                <input type="number" name="distance" id="distance" step="0.001" required>
-            </div>
-            <div class="form-group">
-                <label for="elevation">{{ translations.elevation_label }}</label>
-                <input type="number" name="elevation" id="elevation" step="0.01" required>
-            </div>
-            <div class="form-group" id="time-field">
-                <label for="time">{{ translations.time_label }}</label>
-                <input type="text" name="time" id="time" placeholder="{{ translations.time_placeholder }}">
-            </div>
-            <div class="form-group" id="eph-field" style="display: none;">
-                <label for="eph">{{ translations.eph_label }}</label>
-                <input type="number" name="eph" id="eph" step="0.01">
-            </div>
-            <button type="submit">{{ translations.submit_button }}</button>
-        </form>
-        {% if result %}
-        <div class="result glow">{{ result }}</div>
-        {% endif %}
-        {% if error %}
-        <div class="error">{{ error }}</div>
-        {% endif %}
+    <div class="language-switcher">
+        <button class="language-btn {{ 'active' if lang == 'zh' else '' }}" onclick="switchLanguage('zh')">中文</button>
+        <button class="language-btn {{ 'active' if lang == 'en' else '' }}" onclick="switchLanguage('en')">English</button>
     </div>
+
+    <div class="container">
+        <div class="header">
+            <h1>{{ translations.title }}</h1>
+            <p>{{ 'Professional EpH calculator for running and cycling performance analysis' if lang == 'en' else '專業的EpH計算器，用於跑步和騎行表現分析' }}</p>
+        </div>
+
+        <div class="main-content">
+            <!-- EpH Calculation Card -->
+            <div class="calculator-card">
+                <div class="card-header">
+                    <i class="fas fa-calculator"></i>
+                    <h2>{{ translations.mode_eph }}</h2>
+                </div>
+                
+                <form id="ephForm" class="eph-form">
+                    <div class="form-group">
+                        <label class="form-label">{{ translations.distance_label }}</label>
+                        <input type="number" class="form-input" id="ephDistance" step="0.1" min="0" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">{{ translations.elevation_label }}</label>
+                        <input type="number" class="form-input" id="ephElevation" step="1" min="0" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">
+                            {{ translations.time_label }}
+                            <span class="info-tooltip">
+                                <i class="fas fa-info-circle"></i>
+                                <span class="tooltip-text">{{ 'Enter time in format: hh:mm:ss or hh:mm (e.g., 2:30:00 or 2:30)' if lang == 'en' else '請輸入時間格式：hh:mm:ss 或 hh:mm（例如：2:30:00 或 2:30）' }}</span>
+                            </span>
+                        </label>
+                        <input type="text" class="form-input" id="ephTime" placeholder="{{ translations.time_placeholder }}" required>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary btn-full">
+                        <i class="fas fa-play"></i>
+                        {{ translations.submit_button }}
+                    </button>
+                </form>
+            </div>
+
+            <!-- Time Calculation Card -->
+            <div class="calculator-card">
+                <div class="card-header">
+                    <i class="fas fa-clock"></i>
+                    <h2>{{ translations.mode_time }}</h2>
+                </div>
+                
+                <form id="timeForm" class="time-form">
+                    <div class="form-group">
+                        <label class="form-label">{{ translations.distance_label }}</label>
+                        <input type="number" class="form-input" id="timeDistance" step="0.1" min="0" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">{{ translations.elevation_label }}</label>
+                        <input type="number" class="form-input" id="timeElevation" step="1" min="0" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">{{ translations.eph_label }}</label>
+                        <input type="number" class="form-input" id="timeEph" step="0.01" min="0" required>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary btn-full">
+                        <i class="fas fa-play"></i>
+                        {{ translations.submit_button }}
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div id="resultSection" class="result-section hidden">
+            <div class="result-content">
+                <div id="result" class="result-value"></div>
+                <div id="error" class="error-message hidden"></div>
+            </div>
+        </div>
+
+        <!-- Loading Section -->
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p>{{ 'Calculating...' if lang == 'en' else '計算中...' }}</p>
+        </div>
+
+        <!-- History Section -->
+        <div class="history-section">
+            <div class="history-header">
+                <h3><i class="fas fa-history"></i> {{ 'Calculation History' if lang == 'en' else '計算歷史' }}</h3>
+                <button class="btn btn-secondary" onclick="clearHistory()">
+                    <i class="fas fa-trash"></i>
+                    {{ 'Clear' if lang == 'en' else '清除' }}
+                </button>
+            </div>
+            <div id="history-container"></div>
+        </div>
+    </div>
+
     <script>
-        function toggleFields() {
-            const mode = document.getElementById('mode').value;
-            document.getElementById('time-field').style.display = mode === 'eph' ? 'block' : 'none';
-            document.getElementById('eph-field').style.display = mode === 'time' ? 'block' : 'none';
-            document.getElementById('time').required = mode === 'eph';
-            document.getElementById('eph').required = mode === 'time';
+        // Language switching
+        function switchLanguage(lang) {
+            window.location.href = `/?lang=${lang}`;
         }
-        // Ensure fields are toggled correctly on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            toggleFields();
+
+        // Form submission handlers
+        document.getElementById('ephForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            await calculateEpH();
+        });
+
+        document.getElementById('timeForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            await calculateTime();
+        });
+
+        // EpH calculation
+        async function calculateEpH() {
+            const distance = document.getElementById('ephDistance').value;
+            const elevation = document.getElementById('ephElevation').value;
+            const time = document.getElementById('ephTime').value;
+
+            if (!distance || !elevation || !time) {
+                showError('{{ "Please fill in all fields" if lang == "en" else "請填寫所有欄位" }}');
+                return;
+            }
+
+            showLoading(true);
             
-            // Add animation to inputs when focused
-            const inputs = document.querySelectorAll('input, select');
-            inputs.forEach(input => {
-                input.addEventListener('focus', function() {
-                    this.style.boxShadow = '0 0 15px rgba(0, 216, 255, 0.5)';
+            try {
+                const formData = new FormData();
+                formData.append('mode', 'eph');
+                formData.append('distance', distance);
+                formData.append('elevation', elevation);
+                formData.append('time', time);
+
+                const response = await fetch('/calculate', {
+                    method: 'POST',
+                    body: formData
                 });
-                input.addEventListener('blur', function() {
-                    this.style.boxShadow = 'none';
+
+                const result = await response.json();
+                
+                if (result.error) {
+                    showError(result.error);
+                } else {
+                    showResult(result.result);
+                    saveFormData('eph', distance, elevation, time, '', result.result);
+                }
+            } catch (error) {
+                showError('{{ "An error occurred. Please try again." if lang == "en" else "發生錯誤，請重試。" }}');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Time calculation
+        async function calculateTime() {
+            const distance = document.getElementById('timeDistance').value;
+            const elevation = document.getElementById('timeElevation').value;
+            const eph = document.getElementById('timeEph').value;
+
+            if (!distance || !elevation || !eph) {
+                showError('{{ "Please fill in all fields" if lang == "en" else "請填寫所有欄位" }}');
+                return;
+            }
+
+            showLoading(true);
+            
+            try {
+                const formData = new FormData();
+                formData.append('mode', 'time');
+                formData.append('distance', distance);
+                formData.append('elevation', elevation);
+                formData.append('eph', eph);
+
+                const response = await fetch('/calculate', {
+                    method: 'POST',
+                    body: formData
                 });
+
+                const result = await response.json();
+                
+                if (result.error) {
+                    showError(result.error);
+                } else {
+                    showResult(result.result);
+                    saveFormData('time', distance, elevation, '', eph, result.result);
+                }
+            } catch (error) {
+                showError('{{ "An error occurred. Please try again." if lang == "en" else "發生錯誤，請重試。" }}');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // UI functions
+        function showResult(result) {
+            document.getElementById('resultSection').classList.remove('hidden');
+            document.getElementById('result').textContent = result;
+            document.getElementById('error').classList.add('hidden');
+        }
+
+        function showError(error) {
+            document.getElementById('resultSection').classList.remove('hidden');
+            document.getElementById('error').textContent = error;
+            document.getElementById('error').classList.remove('hidden');
+            document.getElementById('result').classList.add('hidden');
+        }
+
+        function showLoading(show) {
+            document.getElementById('loading').style.display = show ? 'block' : 'none';
+            if (show) {
+                document.getElementById('resultSection').classList.add('hidden');
+            }
+        }
+
+        // History management
+        function saveFormData(mode, distance, elevation, time, eph, result) {
+            const formData = {
+                mode: mode,
+                distance: distance,
+                elevation: elevation,
+                time: time || '',
+                eph: eph || '',
+                timestamp: new Date().toLocaleString(),
+                result: result
+            };
+            
+            let history = JSON.parse(localStorage.getItem('ephCalculatorHistory')) || [];
+            history.unshift(formData);
+            
+            if (history.length > 10) {
+                history = history.slice(0, 10);
+            }
+            
+            localStorage.setItem('ephCalculatorHistory', JSON.stringify(history));
+            loadHistory();
+        }
+
+        function loadHistory() {
+            const history = JSON.parse(localStorage.getItem('ephCalculatorHistory')) || [];
+            const container = document.getElementById('history-container');
+            
+            if (history.length === 0) {
+                container.innerHTML = '<div style="color: var(--text-secondary); font-style: italic; text-align: center; padding: 2rem;">{{ "No calculation history" if lang == "en" else "暫無計算歷史" }}</div>';
+                return;
+            }
+            
+            container.innerHTML = '';
+            
+            history.forEach((item) => {
+                const historyItem = document.createElement('div');
+                historyItem.className = 'history-item';
+                
+                const modeClass = item.mode === 'eph' ? 'eph' : 'time';
+                const modeText = item.mode === 'eph' ? '{{ "Time → Pace" if lang == "en" else "時間→配速" }}' : '{{ "Pace → Time" if lang == "en" else "配速→時間" }}';
+                
+                let dataDisplay = '';
+                if (item.mode === 'eph') {
+                    dataDisplay = `{{ "Distance" if lang == "en" else "距離" }}: ${item.distance} km | {{ "Elevation" if lang == "en" else "海拔" }}: ${item.elevation} m | {{ "Time" if lang == "en" else "時間" }}: ${item.time}`;
+                } else {
+                    dataDisplay = `{{ "Distance" if lang == "en" else "距離" }}: ${item.distance} km | {{ "Elevation" if lang == "en" else "海拔" }}: ${item.elevation} m | {{ "EpH" if lang == "en" else "EpH" }}: ${item.eph}`;
+                }
+                
+                historyItem.innerHTML = `
+                    <div>
+                        <span class="history-mode ${modeClass}">${modeText}</span>
+                        <div style="margin-top: 0.5rem; color: var(--text-primary);">${dataDisplay}</div>
+                        <div style="margin-top: 0.5rem; color: var(--accent-color); font-weight: 600;">${item.result}</div>
+                    </div>
+                    <div class="history-timestamp">${item.timestamp}</div>
+                `;
+                
+                historyItem.addEventListener('click', function() {
+                    fillFormWithHistory(item);
+                });
+                
+                container.appendChild(historyItem);
             });
+        }
+
+        function fillFormWithHistory(item) {
+            if (item.mode === 'eph') {
+                document.getElementById('ephDistance').value = item.distance;
+                document.getElementById('ephElevation').value = item.elevation;
+                document.getElementById('ephTime').value = item.time;
+            } else {
+                document.getElementById('timeDistance').value = item.distance;
+                document.getElementById('timeElevation').value = item.elevation;
+                document.getElementById('timeEph').value = item.eph;
+            }
+        }
+
+        function clearHistory() {
+            if (confirm('{{ "Are you sure you want to clear all history?" if lang == "en" else "確定要清除所有歷史記錄嗎？" }}')) {
+                localStorage.removeItem('ephCalculatorHistory');
+                loadHistory();
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadHistory();
         });
     </script>
 </body>
