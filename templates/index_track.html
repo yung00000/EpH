@@ -30,7 +30,7 @@
             --background-color: #0f172a;
             --card-background: #1e293b;
             --border-color: #334155;
-            --text-primary: #f1f5f9;
+            --text-primary: #ffffff;
             --text-secondary: #94a3b8;
             --error-color: #f87171;
             --success-color: #34d399;
@@ -181,6 +181,7 @@
             display: flex;
             gap: 0.5rem;
             align-items: center;
+            flex-wrap: nowrap;
         }
 
         .language-btn {
@@ -204,6 +205,10 @@
             background: var(--primary-color);
             color: white;
             border-color: var(--primary-color);
+        }
+
+        [data-theme="dark"] .language-btn {
+            color: #ffffff;
         }
 
         .theme-toggle {
@@ -242,48 +247,52 @@
         }
 
         .result-title {
-            font-size: 1.5rem;
+            font-size: 1.2rem;
             font-weight: 600;
             color: var(--primary-color);
             margin-bottom: 1.5rem;
         }
 
         .total-time {
-            font-size: 2.5rem;
+            font-size: 1.8rem;
             font-weight: 700;
             color: var(--success-color);
             margin-bottom: 2rem;
-            padding: 1rem;
+            padding: 0.75rem;
             background: var(--background-color);
             border-radius: 12px;
             border: 2px solid var(--success-color);
+            white-space: nowrap;
+            text-align: center;
         }
 
         .splits-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 1rem;
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
             margin-top: 1.5rem;
+            flex-wrap: nowrap;
         }
 
         .split-item {
             background: var(--background-color);
-            padding: 1rem;
-            border-radius: 8px;
+            padding: 0.5rem 0.75rem;
+            border-radius: 6px;
             border: 1px solid var(--border-color);
             text-align: center;
+            white-space: nowrap;
         }
 
         .split-label {
-            font-size: 0.875rem;
+            font-size: 0.75rem;
             color: var(--text-secondary);
-            margin-bottom: 0.5rem;
+            margin-right: 0.25rem;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
         .split-time {
-            font-size: 1.5rem;
+            font-size: 1.1rem;
             font-weight: 700;
             color: var(--text-primary);
         }
@@ -438,6 +447,19 @@
 
             .splits-container {
                 grid-template-columns: repeat(2, 1fr);
+                gap: 0.25rem;
+            }
+            
+            .split-item {
+                padding: 0.4rem;
+            }
+            
+            .split-label {
+                font-size: 0.7rem;
+            }
+            
+            .split-time {
+                font-size: 1rem;
             }
         }
 
@@ -538,26 +560,21 @@
                 <div class="result-title">{{ translations.result_title }}</div>
                 
                 <div class="total-time">
-                    <div>{{ translations.total_time }}</div>
-                    <div id="totalTime"></div>
+                    <span>{{ translations.total_time }}</span> <span id="totalTime"></span>
                 </div>
                 
                 <div class="splits-container">
                     <div class="split-item">
-                        <div class="split-label">{{ translations.split_100m }}</div>
-                        <div class="split-time" id="split100m"></div>
+                        <span class="split-label">{{ translations.split_100m }}</span><span class="split-time" id="split100m"></span>
                     </div>
                     <div class="split-item">
-                        <div class="split-label">{{ translations.split_200m }}</div>
-                        <div class="split-time" id="split200m"></div>
+                        <span class="split-label">{{ translations.split_200m }}</span><span class="split-time" id="split200m"></span>
                     </div>
                     <div class="split-item">
-                        <div class="split-label">{{ translations.split_300m }}</div>
-                        <div class="split-time" id="split300m"></div>
+                        <span class="split-label">{{ translations.split_300m }}</span><span class="split-time" id="split300m"></span>
                     </div>
                     <div class="split-item">
-                        <div class="split-label">{{ translations.split_400m }}</div>
-                        <div class="split-time" id="split400m"></div>
+                        <span class="split-label">{{ translations.split_400m }}</span><span class="split-time" id="split400m"></span>
                     </div>
                 </div>
                 

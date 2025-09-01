@@ -30,7 +30,7 @@
             --background-color: #0f172a;
             --card-background: #1e293b;
             --border-color: #334155;
-            --text-primary: #f1f5f9;
+            --text-primary: #ffffff;
             --text-secondary: #94a3b8;
             --error-color: #f87171;
             --success-color: #34d399;
@@ -185,6 +185,7 @@
             display: flex;
             gap: 0.5rem;
             align-items: center;
+            flex-wrap: nowrap;
         }
 
         .language-btn {
@@ -196,6 +197,7 @@
             font-weight: 500;
             cursor: pointer;
             transition: all 0.2s ease;
+            color: var(--text-primary);
         }
 
         .language-btn:hover {
@@ -208,6 +210,10 @@
             background: var(--primary-color);
             color: white;
             border-color: var(--primary-color);
+        }
+
+        [data-theme="dark"] .language-btn {
+            color: #ffffff;
         }
 
         .theme-toggle {
@@ -458,7 +464,7 @@
     <div class="container">
         <div class="header">
             <h1>{{ translations.title }}</h1>
-            <p>{{ 'Professional EpH calculator for running and cycling performance analysis' if lang == 'en' else '專業的EpH計算器，用於跑步和騎行表現分析' }}</p>
+            <p>{{ 'Professional EpH calculator for running and cycling performance analysis' if lang == 'en' else '專業的EpH計算器，用於跑步表現分析' }}</p>
         </div>
 
         <!-- Navigation Links -->
