@@ -117,7 +117,7 @@
             color: var(--text-primary);
         }
 
-        .form-select, .form-input {
+        .form-input {
             width: 100%;
             padding: 0.75rem 1rem;
             border: 2px solid var(--border-color);
@@ -127,14 +127,10 @@
             background: var(--card-background);
         }
 
-        .form-select:focus, .form-input:focus {
+        .form-input:focus {
             outline: none;
             border-color: var(--primary-color);
             box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-        }
-
-        .form-select {
-            cursor: pointer;
         }
 
         .btn {
@@ -245,17 +241,61 @@
             text-align: center;
         }
 
-        .result-value {
-            font-size: 2rem;
+        .result-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+        }
+
+        .total-time {
+            font-size: 2.5rem;
             font-weight: 700;
             color: var(--success-color);
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background: var(--background-color);
+            border-radius: 12px;
+            border: 2px solid var(--success-color);
+        }
+
+        .splits-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .split-item {
+            background: var(--background-color);
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            text-align: center;
+        }
+
+        .split-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
             margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .split-time {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
         }
 
         .error-message {
             color: var(--error-color);
             font-weight: 500;
             text-align: center;
+            padding: 1rem;
+            background: rgba(239, 68, 68, 0.1);
+            border-radius: 8px;
+            border: 1px solid var(--error-color);
         }
 
         .history-section {
@@ -294,7 +334,7 @@
             box-shadow: var(--shadow);
         }
 
-        .history-mode {
+        .history-pace {
             display: inline-block;
             padding: 0.25rem 0.75rem;
             border-radius: 20px;
@@ -302,16 +342,8 @@
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-        }
-
-        .history-mode.eph {
             background: rgba(16, 185, 129, 0.1);
             color: var(--success-color);
-        }
-
-        .history-mode.time {
-            background: rgba(37, 99, 235, 0.1);
-            color: var(--primary-color);
         }
 
         .history-timestamp {
@@ -344,12 +376,34 @@
             display: none;
         }
 
-        .conditional-field {
-            display: none;
+        .nav-links {
+            text-align: center;
+            margin-bottom: 2rem;
         }
 
-        .conditional-field.show {
-            display: block;
+        .nav-link {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            margin: 0 0.5rem;
+            background: var(--card-background);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .nav-link:hover {
+            border-color: var(--primary-color);
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .nav-link.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
         }
 
         @media (max-width: 768px) {
@@ -381,6 +435,10 @@
                 margin: 0.5rem auto;
                 max-width: 200px;
             }
+
+            .splits-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
         }
 
         .info-tooltip {
@@ -393,7 +451,7 @@
 
         .info-tooltip .tooltip-text {
             visibility: hidden;
-            width: 250px;
+            width: 300px;
             background-color: var(--text-primary);
             color: white;
             text-align: center;
@@ -403,7 +461,7 @@
             z-index: 1;
             bottom: 125%;
             left: 50%;
-            margin-left: -125px;
+            margin-left: -150px;
             opacity: 0;
             transition: opacity 0.3s;
             font-size: 0.875rem;
@@ -415,34 +473,14 @@
             opacity: 1;
         }
 
-        .nav-links {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        .nav-link {
-            display: inline-block;
-            padding: 0.75rem 1.5rem;
-            margin: 0 0.5rem;
-            background: var(--card-background);
-            border: 2px solid var(--border-color);
+        .examples {
+            background: var(--background-color);
+            padding: 1rem;
             border-radius: 8px;
-            color: var(--text-primary);
-            text-decoration: none;
-            font-weight: 500;
-            transition: all 0.2s ease;
-        }
-
-        .nav-link:hover {
-            border-color: var(--primary-color);
-            background: var(--primary-color);
-            color: white;
-        }
-
-        .nav-link.active {
-            background: var(--primary-color);
-            color: white;
-            border-color: var(--primary-color);
+            border: 1px solid var(--border-color);
+            margin-top: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
         }
     </style>
 </head>
@@ -458,58 +496,33 @@
     <div class="container">
         <div class="header">
             <h1>{{ translations.title }}</h1>
-            <p>{{ 'Professional EpH calculator for running and cycling performance analysis' if lang == 'en' else '專業的EpH計算器，用於跑步和騎行表現分析' }}</p>
+            <p>{{ translations.subtitle }}</p>
         </div>
 
         <!-- Navigation Links -->
         <div class="nav-links">
-            <a href="/" class="nav-link active">{{ 'EpH Calculator' if lang == 'en' else 'EpH計算器' }}</a>
-            <a href="/track" class="nav-link">{{ 'Track Calculator' if lang == 'en' else '賽道計算器' }}</a>
+            <a href="/" class="nav-link">{{ 'EpH Calculator' if lang == 'en' else 'EpH計算器' }}</a>
+            <a href="/track" class="nav-link active">{{ '400m Track Calculator' if lang == 'en' else '400米賽道計算器' }}</a>
         </div>
 
         <!-- Main Calculator Card -->
         <div class="calculator-card">
             <div class="card-header">
-                <i class="fas fa-calculator"></i>
-                <h2>{{ 'EpH Calculator' if lang == 'en' else 'EpH計算器' }}</h2>
+                <i class="fas fa-running"></i>
+                <h2>{{ '400m Track Calculator' if lang == 'en' else '400米賽道計算器' }}</h2>
             </div>
             
             <form id="calculatorForm">
                 <div class="form-group">
-                    <label class="form-label">{{ translations.mode_label }}</label>
-                    <select class="form-select" id="calculationMode" required onchange="toggleFields()">
-                        <option value="">{{ translations.mode_select }}</option>
-                        <option value="eph">{{ translations.mode_eph }}</option>
-                        <option value="time">{{ translations.mode_time }}</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">{{ translations.distance_label }}</label>
-                    <input type="number" class="form-input" id="distance" step="0.1" min="0" required>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">{{ translations.elevation_label }}</label>
-                    <input type="number" class="form-input" id="elevation" step="1" min="0" required>
-                </div>
-                
-                <!-- Time field (shown when calculating EpH) -->
-                <div class="form-group conditional-field" id="timeField">
                     <label class="form-label">
-                        {{ translations.time_label }}
+                        {{ translations.pace_label }}
                         <span class="info-tooltip">
                             <i class="fas fa-info-circle"></i>
-                            <span class="tooltip-text">{{ 'Enter time in format: hh:mm:ss or hh:mm (e.g., 2:30:00 or 2:30)' if lang == 'en' else '請輸入時間格式：hh:mm:ss 或 hh:mm（例如：2:30:00 或 2:30）' }}</span>
+                            <span class="tooltip-text">{{ translations.pace_info }}</span>
                         </span>
                     </label>
-                    <input type="text" class="form-input" id="time" placeholder="{{ translations.time_placeholder }}">
-                </div>
-                
-                <!-- EpH field (shown when calculating time) -->
-                <div class="form-group conditional-field" id="ephField">
-                    <label class="form-label">{{ translations.eph_label }}</label>
-                    <input type="number" class="form-input" id="eph" step="0.01" min="0">
+                    <input type="text" class="form-input" id="pace" placeholder="{{ translations.pace_placeholder }}" required>
+                    <div class="examples">{{ translations.pace_examples }}</div>
                 </div>
                 
                 <button type="submit" class="btn btn-primary btn-full">
@@ -522,7 +535,32 @@
         <!-- Results Section -->
         <div id="resultSection" class="result-section hidden">
             <div class="result-content">
-                <div id="result" class="result-value"></div>
+                <div class="result-title">{{ translations.result_title }}</div>
+                
+                <div class="total-time">
+                    <div>{{ translations.total_time }}</div>
+                    <div id="totalTime"></div>
+                </div>
+                
+                <div class="splits-container">
+                    <div class="split-item">
+                        <div class="split-label">{{ translations.split_100m }}</div>
+                        <div class="split-time" id="split100m"></div>
+                    </div>
+                    <div class="split-item">
+                        <div class="split-label">{{ translations.split_200m }}</div>
+                        <div class="split-time" id="split200m"></div>
+                    </div>
+                    <div class="split-item">
+                        <div class="split-label">{{ translations.split_300m }}</div>
+                        <div class="split-time" id="split300m"></div>
+                    </div>
+                    <div class="split-item">
+                        <div class="split-label">{{ translations.split_400m }}</div>
+                        <div class="split-time" id="split400m"></div>
+                    </div>
+                </div>
+                
                 <div id="error" class="error-message hidden"></div>
             </div>
         </div>
@@ -580,35 +618,7 @@
 
         // Language switching
         function switchLanguage(lang) {
-            window.location.href = `/?lang=${lang}`;
-        }
-
-        // Toggle conditional fields based on calculation mode
-        function toggleFields() {
-            const mode = document.getElementById('calculationMode').value;
-            const timeField = document.getElementById('timeField');
-            const ephField = document.getElementById('ephField');
-            const timeInput = document.getElementById('time');
-            const ephInput = document.getElementById('eph');
-            
-            // Hide both fields initially
-            timeField.classList.remove('show');
-            ephField.classList.remove('show');
-            
-            // Clear values
-            timeInput.value = '';
-            ephInput.value = '';
-            
-            // Show appropriate field based on mode
-            if (mode === 'eph') {
-                timeField.classList.add('show');
-                timeInput.required = true;
-                ephInput.required = false;
-            } else if (mode === 'time') {
-                ephField.classList.add('show');
-                ephInput.required = true;
-                timeInput.required = false;
-            }
+            window.location.href = `/track?lang=${lang}`;
         }
 
         // Form submission handler
@@ -619,29 +629,16 @@
 
         // Main calculation function
         async function calculate() {
-            const mode = document.getElementById('calculationMode').value;
-            const distance = document.getElementById('distance').value;
-            const elevation = document.getElementById('elevation').value;
-            const time = document.getElementById('time').value;
-            const eph = document.getElementById('eph').value;
+            const pace = document.getElementById('pace').value.trim();
 
-            if (!mode) {
-                showError('{{ "Please select a calculation mode" if lang == "en" else "請選擇計算模式" }}');
+            if (!pace) {
+                showError('{{ "Please enter your pace" if lang == "en" else "請輸入配速" }}');
                 return;
             }
 
-            if (!distance || !elevation) {
-                showError('{{ "Please fill in distance and elevation" if lang == "en" else "請填寫距離和海拔" }}');
-                return;
-            }
-
-            if (mode === 'eph' && !time) {
-                showError('{{ "Please enter time for EpH calculation" if lang == "en" else "請輸入時間以計算EpH" }}');
-                return;
-            }
-
-            if (mode === 'time' && !eph) {
-                showError('{{ "Please enter EpH value for time calculation" if lang == "en" else "請輸入EpH值以計算時間" }}');
+            // Validate pace format
+            if (!isValidPaceFormat(pace)) {
+                showError('{{ "Invalid pace format. Use M:SS (e.g., 4:30) or M (e.g., 7). Seconds must be 0-59." if lang == "en" else "無效的配速格式。請使用 M:SS 格式（例如：4:30）或 M 格式（例如：7）。秒數必須在 0-59 之間。" }}');
                 return;
             }
 
@@ -649,15 +646,7 @@
             
             try {
                 const formData = new FormData();
-                formData.append('mode', mode);
-                formData.append('distance', distance);
-                formData.append('elevation', elevation);
-                
-                if (mode === 'eph') {
-                    formData.append('time', time);
-                } else {
-                    formData.append('eph', eph);
-                }
+                formData.append('pace', pace);
 
                 const response = await fetch('/calculate', {
                     method: 'POST',
@@ -669,13 +658,9 @@
                 if (result.error) {
                     showError(result.error);
                 } else {
-                    showResult(result.result);
+                    showResult(result);
                     // Save to history
-                    if (mode === 'eph') {
-                        saveFormData(mode, distance, elevation, time, '', result.result);
-                    } else {
-                        saveFormData(mode, distance, elevation, '', eph, result.result);
-                    }
+                    saveFormData(pace, result);
                 }
             } catch (error) {
                 showError('{{ "An error occurred. Please try again." if lang == "en" else "發生錯誤，請重試。" }}');
@@ -684,18 +669,42 @@
             }
         }
 
+        // Validate pace format
+        function isValidPaceFormat(pace) {
+            // Check if it's just a number (minutes only)
+            if (/^\d+$/.test(pace)) {
+                const minutes = parseInt(pace);
+                return minutes >= 0 && minutes <= 60;
+            }
+            
+            // Check if it's in M:SS format
+            if (/^\d+:\d{1,2}$/.test(pace)) {
+                const [minutes, seconds] = pace.split(':').map(Number);
+                return minutes >= 0 && minutes <= 60 && seconds >= 0 && seconds <= 59;
+            }
+            
+            return false;
+        }
+
         // UI functions
         function showResult(result) {
             document.getElementById('resultSection').classList.remove('hidden');
-            document.getElementById('result').textContent = result;
             document.getElementById('error').classList.add('hidden');
+            
+            // Display total time
+            document.getElementById('totalTime').textContent = result.total_time_min;
+            
+            // Display split times
+            document.getElementById('split100m').textContent = result.split_100m + 's';
+            document.getElementById('split200m').textContent = result.split_200m + 's';
+            document.getElementById('split300m').textContent = result.split_300m + 's';
+            document.getElementById('split400m').textContent = result.split_400m + 's';
         }
 
         function showError(error) {
             document.getElementById('resultSection').classList.remove('hidden');
             document.getElementById('error').textContent = error;
             document.getElementById('error').classList.remove('hidden');
-            document.getElementById('result').classList.add('hidden');
         }
 
         function showLoading(show) {
@@ -706,30 +715,31 @@
         }
 
         // History management
-        function saveFormData(mode, distance, elevation, time, eph, result) {
+        function saveFormData(pace, result) {
             const formData = {
-                mode: mode,
-                distance: distance,
-                elevation: elevation,
-                time: time || '',
-                eph: eph || '',
-                timestamp: new Date().toLocaleString(),
-                result: result
+                pace: pace,
+                total_time: result.total_time_min,
+                total_seconds: result.total_time_sec,
+                split_100m: result.split_100m,
+                split_200m: result.split_200m,
+                split_300m: result.split_300m,
+                split_400m: result.split_400m,
+                timestamp: new Date().toLocaleString()
             };
             
-            let history = JSON.parse(localStorage.getItem('ephCalculatorHistory')) || [];
+            let history = JSON.parse(localStorage.getItem('trackCalculatorHistory')) || [];
             history.unshift(formData);
             
             if (history.length > 10) {
                 history = history.slice(0, 10);
             }
             
-            localStorage.setItem('ephCalculatorHistory', JSON.stringify(history));
+            localStorage.setItem('trackCalculatorHistory', JSON.stringify(history));
             loadHistory();
         }
 
         function loadHistory() {
-            const history = JSON.parse(localStorage.getItem('ephCalculatorHistory')) || [];
+            const history = JSON.parse(localStorage.getItem('trackCalculatorHistory')) || [];
             const container = document.getElementById('history-container');
             
             if (history.length === 0) {
@@ -743,21 +753,15 @@
                 const historyItem = document.createElement('div');
                 historyItem.className = 'history-item';
                 
-                const modeClass = item.mode === 'eph' ? 'eph' : 'time';
-                const modeText = item.mode === 'eph' ? '{{ "Time → Pace" if lang == "en" else "時間→配速" }}' : '{{ "Pace → Time" if lang == "en" else "配速→時間" }}';
-                
-                let dataDisplay = '';
-                if (item.mode === 'eph') {
-                    dataDisplay = `{{ "Distance" if lang == "en" else "距離" }}: ${item.distance} km | {{ "Elevation" if lang == "en" else "海拔" }}: ${item.elevation} m | {{ "Time" if lang == "en" else "時間" }}: ${item.time}`;
-                } else {
-                    dataDisplay = `{{ "Distance" if lang == "en" else "距離" }}: ${item.distance} km | {{ "Elevation" if lang == "en" else "海拔" }}: ${item.elevation} m | {{ "EpH" if lang == "en" else "EpH" }}: ${item.eph}`;
-                }
-                
                 historyItem.innerHTML = `
                     <div>
-                        <span class="history-mode ${modeClass}">${modeText}</span>
-                        <div style="margin-top: 0.5rem; color: var(--text-primary);">${dataDisplay}</div>
-                        <div style="margin-top: 0.5rem; color: var(--accent-color); font-weight: 600;">${item.result}</div>
+                        <span class="history-pace">${item.pace} min/km</span>
+                        <div style="margin-top: 0.5rem; color: var(--text-primary);">
+                            {{ "Total Time" if lang == "en" else "總時間" }}: ${item.total_time}
+                        </div>
+                        <div style="margin-top: 0.5rem; color: var(--accent-color); font-weight: 600;">
+                            {{ "400m" if lang == "en" else "400米" }}: ${item.split_400m}s
+                        </div>
                     </div>
                     <div class="history-timestamp">${item.timestamp}</div>
                 `;
@@ -771,22 +775,12 @@
         }
 
         function fillFormWithHistory(item) {
-            document.getElementById('calculationMode').value = item.mode;
-            document.getElementById('distance').value = item.distance;
-            document.getElementById('elevation').value = item.elevation;
-            
-            if (item.mode === 'eph') {
-                document.getElementById('time').value = item.time;
-            } else {
-                document.getElementById('eph').value = item.eph;
-            }
-            
-            toggleFields();
+            document.getElementById('pace').value = item.pace;
         }
 
         function clearHistory() {
             if (confirm('{{ "Are you sure you want to clear all history?" if lang == "en" else "確定要清除所有歷史記錄嗎？" }}')) {
-                localStorage.removeItem('ephCalculatorHistory');
+                localStorage.removeItem('trackCalculatorHistory');
                 loadHistory();
             }
         }
