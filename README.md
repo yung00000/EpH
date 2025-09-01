@@ -1,31 +1,39 @@
 # EpH Calculator Suite
 
-A comprehensive suite of professional calculators built with FastAPI, designed for running and cycling performance analysis.
+A comprehensive suite of professional calculators built with FastAPI, designed for running and cycling performance analysis. **Now featuring a unified application with mobile-first design and enhanced Pydantic validation.**
 
 ## Applications
 
 1. **EpH Calculator** - Calculate Effort Points per Hour for running/cycling
 2. **400m Track Calculator** - Specialized calculator for 400m track time and split calculations
 
+## ✨ Recent Updates
+
+- **🚀 Unified Application**: Single FastAPI app serving both calculators
+- **📱 Mobile-First Design**: Compact, space-efficient UI optimized for mobile web apps
+- **🔧 Pydantic v2**: Robust data validation with comprehensive error handling
+- **🎨 Enhanced UI**: Simplified language switcher (EN/繁), tighter spacing, compact results
+- **⚡ Performance**: Optimized CSS and JavaScript for mobile devices
+
 ## Features
 
 ### EpH Calculator
 - **Dual Calculation Modes**: Calculate EpH from time or estimate completion time from EpH
-- **Bilingual Support**: English and Traditional Chinese interfaces
+- **Bilingual Support**: English and Traditional Chinese interfaces with compact labels (EN/繁)
 - **Professional UI**: Modern, responsive design with intuitive user experience
 - **Calculation History**: Local storage for tracking previous calculations
 - **Real-time Validation**: Input validation and error handling
-- **Responsive Design**: Works seamlessly on desktop and mobile devices
+- **Mobile-First Design**: Compact, space-efficient design optimized for mobile devices
 
 ### 400m Track Calculator
 - **Pace Input**: Enter pace in min:sec per km format (e.g., 4:30, 7:00)
-- **400m Total Time**: Calculate total time to complete 400m
-- **Split Times**: Calculate split times for 100m, 200m, 300m, and 400m
+- **400m Total Time**: Calculate total time to complete 400m with compact display
+- **Split Times**: Calculate split times for 100m, 200m, 300m, and 400m in horizontal layout
 - **Formula-based**: Uses exact formulas from test.py for accurate calculations
 - **Professional UI**: Consistent design language with the EpH calculator
 - **Calculation History**: Local storage for tracking previous calculations
 - **Real-time Validation**: Input validation and error handling
-- **Responsive Design**: Works seamlessly on desktop and mobile devices
+- **Mobile-First Design**: Compact, space-efficient UI optimized for mobile devices
 
 ## What is EpH?
 
@@ -56,11 +64,12 @@ The 400m calculator uses the exact formulas from your test.py file:
 
 ## Technology Stack
 
-- **Backend**: FastAPI (Python)
+- **Backend**: FastAPI (Python) with Pydantic v2 validation
 - **Frontend**: HTML5, CSS3, JavaScript (ES6+)
-- **Styling**: Custom CSS with CSS Variables
+- **Styling**: Custom CSS with CSS Variables, mobile-first responsive design
 - **Icons**: Font Awesome
 - **Server**: Uvicorn (ASGI)
+- **Validation**: Pydantic v2 with strict field validation
 
 ## Installation
 
@@ -88,38 +97,18 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-4. Run the applications:
-
-**Option 1: Run individually**
+4. Run the unified application:
 ```bash
-# EpH Calculator (Port 8080)
 python app.py
-
-# 400m Track Calculator (Port 8081)
-python app_track.py
-```
-
-**Option 2: Use the startup script**
-```bash
-python start_apps.py
-```
-
-**Option 3: Run both simultaneously**
-```bash
-# Terminal 1
-python app.py
-
-# Terminal 2
-python app_track.py
 ```
 
 **Access URLs:**
 - EpH Calculator: `http://localhost:8080`
-- 400m Track Calculator: `http://localhost:8081`
+- 400m Track Calculator: `http://localhost:8080/track`
 
 ### Environment Variables
 
-- `PORT`: Server port (default: 8080 for EpH, 8081 for Track)
+- `PORT`: Server port (default: 8080)
 - `HOST`: Server host (default: 0.0.0.0)
 - `DEBUG`: Enable debug mode (default: false)
 
@@ -137,14 +126,11 @@ docker run -p 8080:8080 eph-calculator
 
 ## API Endpoints
 
-### EpH Calculator (`app.py`)
-- `GET /`: Main application interface
+### Unified Application (`app.py`)
+- `GET /`: EpH Calculator interface
+- `GET /track`: 400m Track Calculator interface
 - `POST /calculate`: Calculate EpH or estimated time
-- `GET /health`: Health check endpoint
-
-### 400m Track Calculator (`app_track.py`)
-- `GET /`: 400m calculator interface
-- `POST /calculate`: Calculate 400m time and splits from pace
+- `POST /track/calculate`: Calculate 400m time and splits from pace
 - `GET /health`: Health check endpoint
 
 ## Usage
@@ -171,8 +157,8 @@ docker run -p 8080:8080 eph-calculator
 1. Enter your pace in min:sec per km format (e.g., 4:30, 7:00)
 2. Click "Calculate"
 3. View results:
-   - Total time for 400m
-   - Split times for 100m, 200m, 300m, and 400m
+   - Total time for 400m (compact display)
+   - Split times for 100m, 200m, 300m, and 400m (horizontal layout)
 
 #### Pace Format Examples
 - `4:30` = 4 minutes 30 seconds per kilometer
@@ -181,24 +167,38 @@ docker run -p 8080:8080 eph-calculator
 
 ## Features
 
-- **Language Switching**: Toggle between English and Traditional Chinese
+- **Language Switching**: Toggle between English and Traditional Chinese (EN/繁)
+- **Theme Toggle**: Switch between light and dark modes
 - **Input Validation**: Real-time validation with helpful error messages
 - **Calculation History**: View and reuse previous calculations
-- **Responsive Design**: Optimized for all device sizes
+- **Mobile-First Design**: Compact, space-efficient design optimized for mobile devices
 - **Professional UI**: Clean, modern interface with smooth animations
+
+## Recent Improvements
+
+### 🎨 UI/UX Enhancements
+- **Compact Design**: Reduced padding, margins, and font sizes for mobile optimization
+- **Simplified Language Switcher**: EN/繁 labels for space efficiency
+- **Horizontal Split Layout**: 400m split times displayed in one row
+- **Mobile-First Approach**: Optimized spacing and layout for mobile web apps
+
+### 🔧 Technical Improvements
+- **Unified Application**: Single FastAPI app serving both calculators
+- **Pydantic v2**: Robust data validation with comprehensive error handling
+- **Error Handling**: Fixed validation errors and improved error response consistency
+- **Performance**: Optimized CSS and JavaScript for mobile devices
+
+### 🚀 Architecture Updates
+- **Consolidated Backend**: Single application with multiple endpoints
+- **Enhanced Validation**: Strict Pydantic model validation
+- **Mobile Optimization**: CSS media queries and responsive design improvements
 
 ## Testing and Utilities
 
 ### Test Applications
 ```bash
-# Test both applications can start successfully
-python test_apps.py
-```
-
-### Startup Script
-```bash
-# Interactive startup script for managing applications
-python start_apps.py
+# Test the unified application
+python test.py
 ```
 
 ## Contributing
@@ -216,3 +216,9 @@ This project is licensed under the MIT License.
 ## Support
 
 For questions or support, please open an issue in the repository.
+
+---
+
+**Version**: 1.1.0  
+**Status**: Production Ready with Recent UI/UX Improvements  
+**Last Updated**: December 2024

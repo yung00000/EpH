@@ -1,71 +1,72 @@
 # EpH Calculator Project Documentation
 
 ## Project Overview
-The EpH Calculator is a professional web application designed for running performance analysis. It provides two main calculators:
-1. **EpH Calculator** - Calculates Effort Points per Hour for running
+The EpH Calculator Suite is a professional web application designed for running and cycling performance analysis. It provides two main calculators in a unified application:
+1. **EpH Calculator** - Calculates Effort Points per Hour for running and cycling
 2. **400m Track Calculator** - Specialized calculator for 400m track time and split calculations
 
 ## Project Structure
 ```
 EpH/
-├── app.py                 # Main EpH Calculator backend
-├── app_track.py          # 400m Track Calculator backend
+├── app.py                 # Main unified application (EpH + 400m Track)
 ├── templates/
 │   ├── index.html        # EpH Calculator frontend
 │   └── index_track.html  # 400m Track Calculator frontend
 ├── Dockerfile            # Docker configuration
 ├── requirements.txt      # Python dependencies
 ├── README.md            # Project readme
-└── project.md           # This project documentation
+├── project.md           # This project documentation
+└── test.py              # Test calculations and formulas
 ```
 
 ## Features
 
-### 1. EpH Calculator (Existing)
+### 1. EpH Calculator
 - **EpH Calculation**: Calculate Effort Points per Hour given distance, elevation, and time
 - **Time Estimation**: Estimate completion time given distance, elevation, and EpH value
-- **Multi-language Support**: English and Traditional Chinese
-- **Theme Support**: Light and dark mode
+- **Multi-language Support**: English and Traditional Chinese with compact labels (EN/繁)
+- **Theme Support**: Light and dark mode toggle
 - **Calculation History**: Local storage-based history with click-to-fill functionality
+- **Mobile-First Design**: Optimized for mobile web applications with compact UI
 
-### 2. 400m Track Calculator (Specialized)
+### 2. 400m Track Calculator
 - **Pace Input**: Enter pace in min:sec per km format (e.g., 4:30, 7:00)
-- **400m Total Time**: Calculate total time to complete 400m
-- **Split Times**: Calculate split times for 100m, 200m, 300m, and 400m
+- **400m Total Time**: Calculate total time to complete 400m with compact display
+- **Split Times**: Calculate split times for 100m, 200m, 300m, and 400m in horizontal layout
 - **Formula-based**: Uses exact formulas from test.py for accurate calculations
-- **Multi-language Support**: English and Traditional Chinese
-- **Theme Support**: Light and dark mode
+- **Multi-language Support**: English and Traditional Chinese with compact labels (EN/繁)
+- **Theme Support**: Light and dark mode toggle
 - **Calculation History**: Local storage-based history
+- **Mobile-First Design**: Compact, space-efficient UI optimized for mobile devices
 
 ## Technical Architecture
 
 ### Backend Technologies
 - **FastAPI**: Modern, fast web framework for building APIs
-- **Pydantic**: Data validation using Python type annotations
+- **Pydantic v2**: Data validation using Python type annotations with robust error handling
 - **Uvicorn**: ASGI server for running FastAPI applications
 
 ### Frontend Technologies
-- **HTML5**: Semantic markup
-- **CSS3**: Modern styling with CSS custom properties for theming
-- **Vanilla JavaScript**: No external dependencies, lightweight
+- **HTML5**: Semantic markup with accessibility features
+- **CSS3**: Modern styling with CSS custom properties for theming, mobile-first responsive design
+- **Vanilla JavaScript**: No external dependencies, lightweight and performant
 - **Font Awesome**: Icon library for UI elements
 
 ### Key Features
-- **Responsive Design**: Mobile-first approach with CSS Grid and Flexbox
+- **Mobile-First Design**: Optimized for mobile web applications with compact spacing
+- **Responsive Design**: CSS Grid and Flexbox with mobile-specific optimizations
 - **Progressive Enhancement**: Works without JavaScript for basic functionality
 - **Accessibility**: ARIA labels, semantic HTML, keyboard navigation
 - **Performance**: Optimized CSS, minimal JavaScript, efficient DOM manipulation
+- **Compact UI**: Tight spacing, smaller fonts, and optimized layouts for mobile devices
 
 ## API Endpoints
 
-### EpH Calculator (`app.py`)
-- `GET /` - Main page with language support
+### Unified Application (`app.py`)
+- `GET /` - EpH Calculator page with language support
+- `GET /track` - 400m Track Calculator page with language support
 - `POST /calculate` - Calculate EpH or estimated time
-- `GET /health` - Health check endpoint
-
-### 400m Track Calculator (`app_track.py`)
-- `GET /` - 400m calculator page with language support
-- `POST /calculate` - Calculate 400m time and splits from pace
+- `POST /track/calculate` - Calculate 400m time and splits from pace
 - `GET /health` - Health check endpoint
 
 ## Data Models
@@ -81,7 +82,11 @@ class EpHRequest(BaseModel):
 
 class EpHResponse(BaseModel):
     result: str                 # Calculation result
-    error: Optional[str]        # Error message if any
+    error: str = ""            # Error message (empty string for no error)
+    
+    class Config:
+        extra = "forbid"
+        validate_assignment = True
 ```
 
 ### 400m Track Calculator
@@ -90,13 +95,17 @@ class PaceRequest(BaseModel):
     pace: str                   # Pace in min:sec format (e.g., "4:30")
 
 class PaceResponse(BaseModel):
-    total_time_min: str         # Total time in M:SS format
-    total_time_sec: int         # Total time in seconds
-    split_100m: int            # Time for 100m in seconds
-    split_200m: int            # Time for 200m in seconds
-    split_300m: int            # Time for 300m in seconds
-    split_400m: int            # Time for 400m in seconds
-    error: Optional[str]        # Error message if any
+    total_time_min: str = ""    # Total time in M:SS format
+    total_time_sec: int = 0     # Total time in seconds
+    split_100m: int = 0         # Time for 100m in seconds
+    split_200m: int = 0         # Time for 200m in seconds
+    split_300m: int = 0         # Time for 300m in seconds
+    split_400m: int = 0         # Time for 400m in seconds
+    error: str = ""             # Error message (empty string for no error)
+    
+    class Config:
+        extra = "forbid"
+        validate_assignment = True
 ```
 
 ## Calculation Formulas
@@ -120,10 +129,20 @@ class PaceResponse(BaseModel):
 ## User Interface Design
 
 ### Design Principles
+- **Mobile-First**: Optimized for mobile web applications with compact layouts
 - **Consistency**: Same design language across both calculators
 - **Accessibility**: High contrast, readable fonts, clear labels
-- **Responsiveness**: Works on all device sizes
+- **Responsiveness**: Works on all device sizes with mobile optimization
 - **Intuitive**: Clear input fields, logical flow, helpful tooltips
+- **Compact**: Tight spacing, smaller fonts, optimized for mobile screens
+
+### Recent UI Improvements
+- **Compact Language Switcher**: Simplified labels (EN/繁) for mobile optimization
+- **Tight Navigation**: Reduced padding and margins for space efficiency
+- **Mobile-Optimized Results**: Compact result displays with inline labels
+- **Horizontal Split Layout**: 400m split times displayed in one horizontal row
+- **Reduced Font Sizes**: Smaller, more appropriate fonts for mobile devices
+- **Optimized Spacing**: Tighter borders, reduced padding for mobile efficiency
 
 ### Color Scheme
 - **Primary**: Blue (#2563eb) for main actions and highlights
@@ -137,14 +156,21 @@ class PaceResponse(BaseModel):
 ### Code Standards
 - **Python**: Follow PEP 8, use type hints, docstrings
 - **HTML**: Semantic markup, accessibility attributes
-- **CSS**: BEM methodology, CSS custom properties, responsive design
+- **CSS**: BEM methodology, CSS custom properties, responsive design, mobile-first approach
 - **JavaScript**: ES6+, async/await, event delegation
+
+### Pydantic Model Best Practices
+- **Required Fields**: All fields are required with sensible defaults
+- **Validation**: Strict validation with `extra = "forbid"`
+- **Error Handling**: Comprehensive error handling for all edge cases
+- **Type Safety**: Full type hints and validation
 
 ### Testing Strategy
 - **Unit Tests**: Test calculation functions independently
 - **Integration Tests**: Test API endpoints with various inputs
 - **Frontend Tests**: Test form validation and UI interactions
 - **Cross-browser Testing**: Ensure compatibility with major browsers
+- **Mobile Testing**: Focus on mobile device compatibility
 
 ## Deployment
 
@@ -154,9 +180,30 @@ class PaceResponse(BaseModel):
 - Health check endpoints for monitoring
 
 ### Environment Variables
-- `PORT`: Server port (default: 8080 for EpH, 8081 for Track)
+- `PORT`: Server port (default: 8080)
 - `HOST`: Server host (default: 0.0.0.0)
 - `DEBUG`: Debug mode (default: false)
+
+## Recent Fixes and Improvements
+
+### Pydantic Validation Fixes
+- **EpHResponse Model**: Fixed missing field validation errors
+- **PaceResponse Model**: Ensured all fields have proper defaults
+- **Error Handling**: Improved error response consistency
+- **Model Configuration**: Added strict validation and assignment checking
+
+### UI/UX Improvements
+- **Mobile Optimization**: Compact, space-efficient design for mobile web apps
+- **Language Labels**: Simplified language switcher (EN/繁)
+- **Result Display**: Compact result windows with inline formatting
+- **Split Time Layout**: Horizontal layout for 400m split times
+- **Responsive Design**: Enhanced mobile-specific CSS adjustments
+
+### Code Quality
+- **Unified Application**: Single FastAPI app with multiple endpoints
+- **Error Handling**: Comprehensive error handling for all scenarios
+- **Type Safety**: Full Pydantic validation and type checking
+- **Performance**: Optimized CSS and JavaScript for mobile devices
 
 ## Future Enhancements
 
@@ -191,12 +238,16 @@ class PaceResponse(BaseModel):
 
 ### Completed
 - ✅ EpH Calculator backend and frontend
-- ✅ Multi-language support (EN/CN)
+- ✅ Multi-language support (EN/繁)
 - ✅ Theme switching (Light/Dark)
 - ✅ Calculation history functionality
 - ✅ Responsive design implementation
 - ✅ 400m Track Calculator backend and frontend
 - ✅ Specialized 400m calculations with split times
+- ✅ Mobile-first UI optimization
+- ✅ Pydantic validation fixes
+- ✅ Compact, space-efficient design
+- ✅ Unified application architecture
 
 ### In Progress
 - 🔄 Project documentation updates
@@ -221,5 +272,6 @@ class PaceResponse(BaseModel):
 
 ---
 
-*Last Updated: [Current Date]*
+*Last Updated: December 2024*
 *Version: 1.1.0*
+*Status: Production Ready with Recent UI/UX Improvements*
