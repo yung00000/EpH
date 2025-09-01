@@ -648,7 +648,7 @@
                 const formData = new FormData();
                 formData.append('pace', pace);
 
-                const response = await fetch('/calculate', {
+                const response = await fetch('/track/calculate', {
                     method: 'POST',
                     body: formData
                 });
