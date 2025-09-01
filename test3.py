@@ -13,13 +13,11 @@ def calculate_times(pace_seconds, distance_km):
     """Calculate total time and split times for the given distance."""
     # Total time for the distance
     total_seconds = pace_seconds * distance_km
-    total_minutes = int(total_seconds // 60)
-    total_rem_seconds = int(total_seconds % 60)
     
     # Calculate number of full 400m laps and remaining meters
     total_meters = distance_km * 1000
-    full_laps = total_meters // 400
-    remaining_meters = total_meters % 400
+    full_laps = int(total_meters // 400)
+    remaining_meters = int(total_meters % 400)
     
     # Time per 400m
     lap_time_seconds = pace_seconds * 0.4
@@ -28,25 +26,29 @@ def calculate_times(pace_seconds, distance_km):
     hundred_time_seconds = pace_seconds * 0.1
     
     return (
-        total_seconds, total_minutes, total_rem_seconds,
+        total_seconds,
         lap_time_seconds, hundred_time_seconds,
         full_laps, remaining_meters
     )
 
-def format_time(minutes, seconds):
-    """Format time as M:SS or M minutes."""
-    if seconds == 0:
-        return f"{minutes} minute{'s' if minutes != 1 else ''}"
-    return f"{minutes} minute{'s' if minutes != 1 else ''} and {seconds} second{'s' if seconds != 1 else ''}"
+def format_time_seconds(total_seconds):
+    """Format time as HH:MM:SS."""
+    hours = int(total_seconds // 3600)
+    minutes = int((total_seconds % 3600) // 60)
+    seconds = int(total_seconds % 60)
+    
+    return f"{hours:02d}:{minutes:02d}:{seconds:02d}"
 
 def format_seconds(seconds):
-    """Format seconds to MM:SS or SS seconds."""
-    mins = int(seconds // 60)
+    """Format seconds to HH:MM:SS or MM:SS."""
+    hours = int(seconds // 3600)
+    minutes = int((seconds % 3600) // 60)
     secs = int(seconds % 60)
-    if mins > 0:
-        return f"{mins}:{secs:02d}"
+    
+    if hours > 0:
+        return f"{hours:02d}:{minutes:02d}:{secs:02d}"
     else:
-        return f"{secs} second{'s' if secs != 1 else ''}"
+        return f"{minutes:02d}:{secs:02d}"
 
 def main():
     print("Running Pace Calculator")
@@ -63,12 +65,12 @@ def main():
         
         pace_seconds = parse_pace(pace_input)
         (
-            total_seconds, total_minutes, total_rem_seconds,
+            total_seconds,
             lap_time_seconds, hundred_time_seconds,
             full_laps, remaining_meters
         ) = calculate_times(pace_seconds, distance_km)
         
-        total_time_str = format_time(total_minutes, total_rem_seconds)
+        total_time_str = format_time_seconds(total_seconds)
         lap_time_str = format_seconds(lap_time_seconds)
         hundred_time_str = format_seconds(hundred_time_seconds)
         
@@ -88,11 +90,10 @@ def main():
         if full_laps > 0:
             print("\nSplit times for each 400m lap:")
             cumulative_time = 0
-            for lap in range(1, int(full_laps) + 1):
+            for lap in range(1, full_laps + 1):
                 cumulative_time += lap_time_seconds
-                lap_minutes = int(cumulative_time // 60)
-                lap_seconds = int(cumulative_time % 60)
-                print(f"Lap {lap}: {lap_minutes}:{lap_seconds:02d}")
+                lap_time_formatted = format_time_seconds(cumulative_time)
+                print(f"Lap {lap}: {lap_time_formatted}")
         
     except ValueError as e:
         print(f"Error: {e}")
