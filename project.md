@@ -1,8 +1,8 @@
 # EpH Calculator Project Documentation
 
 ## Project Overview
-The EpH Calculator is a professional web application designed for running and cycling performance analysis. It provides two main calculators:
-1. **EpH Calculator** - Calculates Effort Points per Hour for running/cycling
+The EpH Calculator is a professional web application designed for running performance analysis. It provides two main calculators:
+1. **EpH Calculator** - Calculates Effort Points per Hour for running
 2. **400m Track Calculator** - Specialized calculator for 400m track time and split calculations
 
 ## Project Structure

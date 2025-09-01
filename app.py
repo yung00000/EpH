@@ -109,20 +109,56 @@ class EpHRequest(BaseModel):
 
 class EpHResponse(BaseModel):
     result: str                 # Calculation result
-    error: Optional[str]        # Error message if any
+    error: str = ""            # Error message if any (empty string for no error)
+    
+    class Config:
+        # Ensure all fields are properly handled
+        extra = "forbid"
+        validate_assignment = True
+    
+    def __init__(self, **data):
+        # Ensure all fields are properly set
+        if 'result' not in data:
+            data['result'] = ""
+        if 'error' not in data:
+            data['error'] = ""
+        super().__init__(**data)
 
 # Track Calculator Models
 class PaceRequest(BaseModel):
     pace: str
 
 class PaceResponse(BaseModel):
-    total_time_min: str
-    total_time_sec: int
-    split_100m: int
-    split_200m: int
-    split_300m: int
-    split_400m: int
-    error: Optional[str] = None
+    total_time_min: str = ""
+    total_time_sec: int = 0
+    split_100m: int = 0
+    split_200m: int = 0
+    split_300m: int = 0
+    split_400m: int = 0
+    error: str = ""
+    
+    class Config:
+        # Ensure all fields are properly handled
+        extra = "forbid"
+        validate_assignment = True
+    
+    def __init__(self, **data):
+        # Ensure all fields are properly set
+        if 'total_time_min' not in data:
+            data['total_time_min'] = ""
+        if 'total_time_sec' not in data:
+            data['total_time_sec'] = 0
+        if 'split_100m' not in data:
+            data['split_100m'] = 0
+        if 'split_200m' not in data:
+            data['split_200m'] = 0
+        if 'split_300m' not in data:
+            data['split_300m'] = 0
+        if 'split_400m' not in data:
+            data['split_400m'] = 0
+        if 'error' not in data:
+            data['error'] = ""
+        super().__init__(**data)
 
 def hms_to_hours(time_str: str) -> float:
     """Convert hh:mm:ss or hh:mm format to hours (decimal)"""
@@ -243,13 +279,13 @@ async def calculate(request: Request, mode: str = Form(...),
             if not time:
                 return EpHResponse(result="", error="Time is required for EpH calculation")
             result = calculate_eph(distance, elevation, time)
-            return EpHResponse(result=f"EpH = {result:.2f}")
+            return EpHResponse(result=f"EpH = {result:.2f}", error="")
         
         elif mode == 'time':
             if not eph:
                 return EpHResponse(result="", error="EpH value is required for time calculation")
             result = calculate_time(distance, elevation, eph)
-            return EpHResponse(result=f"Estimated Time = {result}")
+            return EpHResponse(result=f"Estimated Time = {result}", error="")
         
         else:
             return EpHResponse(result="", error="Invalid calculation mode")
@@ -300,6 +336,7 @@ async def track_calculate(request: Request, pace: str = Form(...)):
             total_time_min="",
             total_time_sec=0,
             split_100m=0,
+            split_200m=0,
             split_300m=0,
             split_400m=0,
             error="An error occurred during calculation"
