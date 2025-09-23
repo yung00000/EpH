@@ -186,6 +186,16 @@ class PaceResponse(BaseModel):
 
 ## Recent Fixes and Improvements
 
+### Navigation and Layout Fixes (December 2024)
+- **Navigation Button Layout**: Fixed inconsistent button layout between calculator pages
+  - EpH Calculator and 400m Track Calculator now have consistent horizontal button layout
+  - Buttons stay on one line across all screen sizes (desktop and mobile)
+  - Fixed CSS `display: block` to `display: inline-block` for mobile navigation
+- **Language Persistence**: Fixed language switching issue when navigating between calculators
+  - Navigation links now preserve language parameter (`?lang=en` or `?lang=zh`)
+  - Users stay in their selected language when switching between calculator functions
+  - Fixed hardcoded navigation URLs to include dynamic language parameter
+
 ### Pydantic Validation Fixes
 - **EpHResponse Model**: Fixed missing field validation errors
 - **PaceResponse Model**: Ensured all fields have proper defaults
@@ -198,6 +208,7 @@ class PaceResponse(BaseModel):
 - **Result Display**: Compact result windows with inline formatting
 - **Split Time Layout**: Horizontal layout for 400m split times
 - **Responsive Design**: Enhanced mobile-specific CSS adjustments
+- **Consistent Navigation**: Uniform button layout and behavior across all pages
 
 ### Code Quality
 - **Unified Application**: Single FastAPI app with multiple endpoints
@@ -248,9 +259,10 @@ class PaceResponse(BaseModel):
 - ✅ Pydantic validation fixes
 - ✅ Compact, space-efficient design
 - ✅ Unified application architecture
+- ✅ Navigation button layout consistency fix
+- ✅ Language persistence across calculator navigation
 
 ### In Progress
-- 🔄 Project documentation updates
 - 🔄 Testing and quality assurance
 
 ### Next Steps
@@ -273,5 +285,5 @@ class PaceResponse(BaseModel):
 ---
 
 *Last Updated: December 2024*
-*Version: 1.1.0*
-*Status: Production Ready with Recent UI/UX Improvements*
+*Version: 1.1.1*
+*Status: Production Ready with Navigation and Language Persistence Fixes*
