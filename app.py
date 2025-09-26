@@ -9,8 +9,8 @@ import os
 import uvicorn
 
 app = FastAPI(
-    title="EpH Calculator Suite",
-    description="Professional EpH and 400m Track Calculator for running and cycling",
+    title="RunCalc Pro",
+    description="Professional EpH and 400m Track Calculator for running",
     version="1.1.0"
 )
 
