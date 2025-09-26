@@ -21,7 +21,7 @@ templates = Jinja2Templates(directory="templates")
 TRANSLATIONS = {
     'en': {
         'title': 'EpH Calculator',
-        'subtitle': 'Professional EpH calculator for running performance analysis',
+        'subtitle': 'Professional EpH calculator for trailrunning performance analysis',
         'mode_label': 'Calculation Mode:',
         'mode_select': 'Select',
         'mode_eph': 'Calculate EpH',
@@ -41,7 +41,7 @@ TRANSLATIONS = {
     },
     'zh': {
         'title': 'EpH計算器',
-        'subtitle': '專業的EpH計算器，用於跑步表現分析',
+        'subtitle': '專業的EpH計算器，用於越野跑步表現分析',
         'mode_label': '計算模式：',
         'mode_select': '請選擇',
         'mode_eph': '計算EpH',
