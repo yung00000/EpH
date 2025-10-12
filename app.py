@@ -16,6 +16,7 @@ app = FastAPI(
 
 # Mount static files and templates
 templates = Jinja2Templates(directory="templates")
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Translation dictionary for English and Traditional Chinese
 TRANSLATIONS = {
