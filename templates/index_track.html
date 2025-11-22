@@ -335,8 +335,7 @@
 
                  .history-item {
              display: flex;
-             justify-content: space-between;
-             align-items: center;
+             align-items: flex-start;
              padding: 0.75rem;
              border: 1px solid var(--border-color);
              border-radius: 6px;
@@ -344,6 +343,7 @@
              cursor: pointer;
              transition: all 0.2s ease;
              background: var(--background-color);
+             overflow: hidden;
          }
 
         .history-item:hover {
@@ -365,8 +365,9 @@
         }
 
         .history-timestamp {
-            font-size: 0.875rem;
+            font-size: 0.75rem;
             color: var(--text-secondary);
+            white-space: nowrap;
         }
 
         .loading {
@@ -727,6 +728,16 @@
             return false;
         }
 
+        // Format seconds as min:sec if >= 60, otherwise as seconds
+        function formatTime(seconds) {
+            if (seconds >= 60) {
+                const minutes = Math.floor(seconds / 60);
+                const secs = seconds % 60;
+                return `${minutes}:${secs.toString().padStart(2, '0')}`;
+            }
+            return seconds + 's';
+        }
+
         // UI functions
         function showResult(result) {
             document.getElementById('resultSection').classList.remove('hidden');
@@ -736,10 +747,10 @@
             document.getElementById('totalTime').textContent = result.total_time_min;
             
             // Display split times
-            document.getElementById('split100m').textContent = result.split_100m + 's';
-            document.getElementById('split200m').textContent = result.split_200m + 's';
-            document.getElementById('split300m').textContent = result.split_300m + 's';
-            document.getElementById('split400m').textContent = result.split_400m + 's';
+            document.getElementById('split100m').textContent = formatTime(result.split_100m);
+            document.getElementById('split200m').textContent = formatTime(result.split_200m);
+            document.getElementById('split300m').textContent = formatTime(result.split_300m);
+            document.getElementById('split400m').textContent = formatTime(result.split_400m);
         }
 
         function showError(error) {
@@ -795,16 +806,18 @@
                 historyItem.className = 'history-item';
                 
                 historyItem.innerHTML = `
-                    <div>
-                        <span class="history-pace">${item.pace} min/km</span>
-                        <div style="margin-top: 0.5rem; color: var(--text-primary);">
-                            {{ "Total Time" if lang == "en" else "總時間" }}: ${item.total_time}
+                    <div style="flex: 1; min-width: 0;">
+                        <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.4rem;">
+                            <span class="history-pace">${item.pace} min/km</span>
+                            <div class="history-timestamp" style="flex-shrink: 0;">${item.timestamp}</div>
                         </div>
-                        <div style="margin-top: 0.5rem; color: var(--accent-color); font-weight: 600;">
-                            {{ "400m" if lang == "en" else "400米" }}: ${item.split_400m}s
+                        <div style="display: flex; gap: 0.5rem; flex-wrap: nowrap; font-size: 0.75rem; white-space: nowrap; overflow-x: auto;">
+                            <span style="color: var(--text-secondary); white-space: nowrap;">{{ "100m" if lang == "en" else "100米" }}: <strong style="color: var(--text-primary);">${formatTime(item.split_100m)}</strong></span>
+                            <span style="color: var(--text-secondary); white-space: nowrap;">{{ "200m" if lang == "en" else "200米" }}: <strong style="color: var(--text-primary);">${formatTime(item.split_200m)}</strong></span>
+                            <span style="color: var(--text-secondary); white-space: nowrap;">{{ "300m" if lang == "en" else "300米" }}: <strong style="color: var(--text-primary);">${formatTime(item.split_300m)}</strong></span>
+                            <span style="color: var(--accent-color); font-weight: 600; white-space: nowrap;">{{ "400m" if lang == "en" else "400米" }}: ${formatTime(item.split_400m)}</span>
                         </div>
                     </div>
-                    <div class="history-timestamp">${item.timestamp}</div>
                 `;
                 
                 historyItem.addEventListener('click', function() {
