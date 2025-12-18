@@ -184,7 +184,7 @@ export default function EpHCalculatorScreen() {
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={styles.navButton}
+            style={[styles.navButton, styles.navButtonSpacing]}
             onPress={() => navigation.navigate('TrackCalculator' as never)}
           >
             <Text style={styles.navButtonText}>{t('common.trackCalculator')}</Text>
@@ -203,7 +203,7 @@ export default function EpHCalculatorScreen() {
             <Text style={styles.label}>{t('eph.modeLabel')}</Text>
             <View style={styles.modeContainer}>
               <TouchableOpacity
-                style={[styles.modeButton, mode === 'eph' && styles.modeButtonActive]}
+                style={[styles.modeButton, mode === 'eph' ? styles.modeButtonActive : null]}
                 onPress={() => {
                   setMode('eph');
                   setEph('');
@@ -214,14 +214,14 @@ export default function EpHCalculatorScreen() {
                 <Text
                   style={[
                     styles.modeButtonText,
-                    mode === 'eph' && styles.modeButtonTextActive,
+                    mode === 'eph' ? styles.modeButtonTextActive : null,
                   ]}
                 >
                   {t('eph.modeEph')}
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[styles.modeButton, mode === 'time' && styles.modeButtonActive]}
+                style={[styles.modeButton, styles.modeButtonSpacing, mode === 'time' ? styles.modeButtonActive : null]}
                 onPress={() => {
                   setMode('time');
                   setTime('');
@@ -232,7 +232,7 @@ export default function EpHCalculatorScreen() {
                 <Text
                   style={[
                     styles.modeButtonText,
-                    mode === 'time' && styles.modeButtonTextActive,
+                    mode === 'time' ? styles.modeButtonTextActive : null,
                   ]}
                 >
                   {t('eph.modeTime')}
@@ -396,7 +396,6 @@ function createStyles(isDark: boolean) {
     },
     modeContainer: {
       flexDirection: 'row',
-      gap: 8,
     },
     modeButton: {
       flex: 1,
@@ -406,6 +405,9 @@ function createStyles(isDark: boolean) {
       borderColor: isDark ? '#334155' : '#e2e8f0',
       backgroundColor: isDark ? '#0f172a' : '#f8fafc',
       alignItems: 'center',
+    },
+    modeButtonSpacing: {
+      marginLeft: 8,
     },
     modeButtonActive: {
       backgroundColor: isDark ? '#3b82f6' : '#2563eb',
@@ -454,7 +456,6 @@ function createStyles(isDark: boolean) {
       flexDirection: 'row',
       justifyContent: 'center',
       marginBottom: 16,
-      gap: 8,
     },
     navButton: {
       paddingVertical: 8,
@@ -463,6 +464,9 @@ function createStyles(isDark: boolean) {
       borderWidth: 1,
       borderColor: isDark ? '#334155' : '#e2e8f0',
       backgroundColor: isDark ? '#1e293b' : '#ffffff',
+    },
+    navButtonSpacing: {
+      marginLeft: 8,
     },
     navButtonActive: {
       backgroundColor: isDark ? '#3b82f6' : '#2563eb',

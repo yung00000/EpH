@@ -107,7 +107,7 @@ export default function HistorySection({
                     : styles.modeBadgeTextTime,
                 ]}
               >
-                {modeText}
+                {modeText.toUpperCase()}
               </Text>
             </View>
             <Text style={styles.timestamp}>{item.timestamp}</Text>
@@ -140,15 +140,15 @@ export default function HistorySection({
               {language === 'en' ? '100m' : '100米'}:{' '}
               <Text style={styles.splitValue}>{formatTime(item.split_100m)}</Text>
             </Text>
-            <Text style={styles.splitText}>
+            <Text style={[styles.splitText, styles.splitTextSpacing]}>
               {language === 'en' ? '200m' : '200米'}:{' '}
               <Text style={styles.splitValue}>{formatTime(item.split_200m)}</Text>
             </Text>
-            <Text style={styles.splitText}>
+            <Text style={[styles.splitText, styles.splitTextSpacing]}>
               {language === 'en' ? '300m' : '300米'}:{' '}
               <Text style={styles.splitValue}>{formatTime(item.split_300m)}</Text>
             </Text>
-            <Text style={[styles.splitText, styles.splitText400m]}>
+            <Text style={[styles.splitText, styles.splitText400m, styles.splitTextSpacing]}>
               {language === 'en' ? '400m' : '400米'}:{' '}
               <Text style={styles.splitValue}>{formatTime(item.split_400m)}</Text>
             </Text>
@@ -167,7 +167,7 @@ export default function HistorySection({
             size={20}
             color={isDark ? '#ffffff' : '#1e293b'}
           />
-          <Text style={styles.title}>{t.title}</Text>
+          <Text style={[styles.title, styles.titleSpacing]}>{t.title}</Text>
         </View>
         {history.length > 0 && (
           <TouchableOpacity style={styles.clearButton} onPress={handleClear}>
@@ -218,22 +218,24 @@ function createStyles(isDark: boolean) {
     headerLeft: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: 8,
     },
     title: {
       fontSize: 16,
       fontWeight: '600',
       color: isDark ? '#ffffff' : '#1e293b',
     },
+    titleSpacing: {
+      marginLeft: 8,
+    },
     clearButton: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: 4,
       padding: 4,
     },
     clearButtonText: {
       fontSize: 14,
       color: isDark ? '#94a3b8' : '#64748b',
+      marginLeft: 4,
     },
     emptyContainer: {
       padding: 32,
@@ -256,7 +258,7 @@ function createStyles(isDark: boolean) {
       borderColor: isDark ? '#334155' : '#e2e8f0',
     },
     historyContent: {
-      gap: 8,
+      // Removed gap - using marginTop on children instead
     },
     historyHeader: {
       flexDirection: 'row',
@@ -280,7 +282,6 @@ function createStyles(isDark: boolean) {
     modeBadgeText: {
       fontSize: 11,
       fontWeight: '600',
-      textTransform: 'uppercase',
     },
     modeBadgeTextEph: {
       color: isDark ? '#34d399' : '#10b981',
@@ -309,12 +310,14 @@ function createStyles(isDark: boolean) {
     trackSplits: {
       flexDirection: 'row',
       flexWrap: 'wrap',
-      gap: 12,
       marginTop: 4,
     },
     splitText: {
       fontSize: 12,
       color: isDark ? '#94a3b8' : '#64748b',
+    },
+    splitTextSpacing: {
+      marginLeft: 12,
     },
     splitText400m: {
       fontWeight: '600',

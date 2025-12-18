@@ -143,7 +143,7 @@ export default function TrackCalculatorScreen() {
             <Text style={styles.navButtonText}>{t('common.ephCalculator')}</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[styles.navButton, styles.navButtonActive]}
+            style={[styles.navButton, styles.navButtonSpacing, styles.navButtonActive]}
             onPress={() => {}}
           >
             <Text style={[styles.navButtonText, styles.navButtonTextActive]}>
@@ -200,19 +200,19 @@ export default function TrackCalculatorScreen() {
             </View>
             <View style={styles.splitsContainer}>
               <View style={styles.splitItem}>
-                <Text style={styles.splitLabel}>{t('track.split100m')}</Text>
+                <Text style={styles.splitLabel}>{t('track.split100m').toUpperCase()}</Text>
                 <Text style={styles.splitTime}>{formatTime(result.split_100m)}</Text>
               </View>
-              <View style={styles.splitItem}>
-                <Text style={styles.splitLabel}>{t('track.split200m')}</Text>
+              <View style={[styles.splitItem, styles.splitItemSpacing]}>
+                <Text style={styles.splitLabel}>{t('track.split200m').toUpperCase()}</Text>
                 <Text style={styles.splitTime}>{formatTime(result.split_200m)}</Text>
               </View>
-              <View style={styles.splitItem}>
-                <Text style={styles.splitLabel}>{t('track.split300m')}</Text>
+              <View style={[styles.splitItem, styles.splitItemSpacing]}>
+                <Text style={styles.splitLabel}>{t('track.split300m').toUpperCase()}</Text>
                 <Text style={styles.splitTime}>{formatTime(result.split_300m)}</Text>
               </View>
-              <View style={styles.splitItem}>
-                <Text style={styles.splitLabel}>{t('track.split400m')}</Text>
+              <View style={[styles.splitItem, styles.splitItemSpacing]}>
+                <Text style={styles.splitLabel}>{t('track.split400m').toUpperCase()}</Text>
                 <Text style={[styles.splitTime, styles.splitTime400m]}>
                   {formatTime(result.split_400m)}
                 </Text>
@@ -355,12 +355,10 @@ function createStyles(isDark: boolean) {
     splitsContainer: {
       flexDirection: 'row',
       flexWrap: 'wrap',
-      gap: 12,
-      justifyContent: 'center',
+      justifyContent: 'space-between',
     },
     splitItem: {
-      flex: 1,
-      minWidth: '45%',
+      width: '48%',
       backgroundColor: isDark ? '#0f172a' : '#f8fafc',
       borderRadius: 8,
       padding: 12,
@@ -368,11 +366,13 @@ function createStyles(isDark: boolean) {
       borderColor: isDark ? '#334155' : '#e2e8f0',
       alignItems: 'center',
     },
+    splitItemSpacing: {
+      marginTop: 12,
+    },
     splitLabel: {
       fontSize: 12,
       color: isDark ? '#94a3b8' : '#64748b',
       marginBottom: 4,
-      textTransform: 'uppercase',
     },
     splitTime: {
       fontSize: 16,
@@ -392,7 +392,6 @@ function createStyles(isDark: boolean) {
       flexDirection: 'row',
       justifyContent: 'center',
       marginBottom: 16,
-      gap: 8,
     },
     navButton: {
       paddingVertical: 8,
@@ -401,6 +400,9 @@ function createStyles(isDark: boolean) {
       borderWidth: 1,
       borderColor: isDark ? '#334155' : '#e2e8f0',
       backgroundColor: isDark ? '#1e293b' : '#ffffff',
+    },
+    navButtonSpacing: {
+      marginLeft: 8,
     },
     navButtonActive: {
       backgroundColor: isDark ? '#3b82f6' : '#2563eb',

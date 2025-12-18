@@ -8,7 +8,7 @@ import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Language } from '../types';
 import { saveLanguage } from '../utils/storage';
-import { useColorScheme } from 'react-native';
+import { useTheme } from '../contexts/ThemeContext';
 
 interface LanguageSwitcherProps {
   language: Language;
@@ -20,8 +20,7 @@ export default function LanguageSwitcher({
   onLanguageChange,
 }: LanguageSwitcherProps) {
   const { i18n } = useTranslation();
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === 'dark';
+  const { isDark } = useTheme();
 
   const handleLanguageChange = async (lang: Language) => {
     i18n.changeLanguage(lang);
@@ -36,14 +35,14 @@ export default function LanguageSwitcher({
       <TouchableOpacity
         style={[
           styles.button,
-          language === 'zh' && styles.buttonActive,
+          language === 'zh' ? styles.buttonActive : null,
         ]}
         onPress={() => handleLanguageChange('zh')}
       >
         <Text
           style={[
             styles.buttonText,
-            language === 'zh' && styles.buttonTextActive,
+            language === 'zh' ? styles.buttonTextActive : null,
           ]}
         >
           繁
@@ -52,14 +51,15 @@ export default function LanguageSwitcher({
       <TouchableOpacity
         style={[
           styles.button,
-          language === 'en' && styles.buttonActive,
+          styles.buttonSpacing,
+          language === 'en' ? styles.buttonActive : null,
         ]}
         onPress={() => handleLanguageChange('en')}
       >
         <Text
           style={[
             styles.buttonText,
-            language === 'en' && styles.buttonTextActive,
+            language === 'en' ? styles.buttonTextActive : null,
           ]}
         >
           EN
@@ -73,7 +73,6 @@ function createStyles(isDark: boolean) {
   return StyleSheet.create({
     container: {
       flexDirection: 'row',
-      gap: 4,
       alignItems: 'center',
     },
     button: {
@@ -85,6 +84,9 @@ function createStyles(isDark: boolean) {
       paddingHorizontal: 12,
       minWidth: 40,
       alignItems: 'center',
+    },
+    buttonSpacing: {
+      marginLeft: 4,
     },
     buttonActive: {
       backgroundColor: isDark ? '#3b82f6' : '#2563eb',
