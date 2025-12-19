@@ -12,6 +12,7 @@ import {
   ScrollView,
   Alert,
 } from 'react-native';
+import { Swipeable } from 'react-native-gesture-handler';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../contexts/ThemeContext';
 import { Language } from '../types';
@@ -22,6 +23,7 @@ interface HistorySectionProps {
   history: EpHHistoryItem[] | TrackHistoryItem[];
   onItemPress: (item: EpHHistoryItem | TrackHistoryItem) => void;
   onClear: () => void;
+  onDeleteItem?: (index: number) => void;
   language: Language;
   type: 'eph' | 'track';
 }
@@ -30,6 +32,7 @@ export default function HistorySection({
   history,
   onItemPress,
   onClear,
+  onDeleteItem,
   language,
   type,
 }: HistorySectionProps) {
@@ -64,6 +67,32 @@ export default function HistorySection({
     ]);
   };
 
+  const renderDeleteAction = (index: number) => {
+    return (
+      <TouchableOpacity
+        style={styles.deleteAction}
+        onPress={() => {
+          if (onDeleteItem) {
+            Alert.alert(
+              language === 'en' ? 'Delete Item' : '刪除項目',
+              language === 'en' ? 'Are you sure you want to delete this item?' : '確定要刪除此項目嗎？',
+              [
+                { text: language === 'en' ? 'Cancel' : '取消', style: 'cancel' },
+                {
+                  text: language === 'en' ? 'Delete' : '刪除',
+                  style: 'destructive',
+                  onPress: () => onDeleteItem(index),
+                },
+              ]
+            );
+          }
+        }}
+      >
+        <Ionicons name="trash" size={20} color="#ffffff" />
+      </TouchableOpacity>
+    );
+  };
+
   const renderEphHistoryItem = (item: EpHHistoryItem, index: number) => {
     const modeText =
       item.mode === 'eph'
@@ -85,9 +114,8 @@ export default function HistorySection({
             language === 'en' ? 'Elevation' : '海拔'
           }: ${item.elevation} m | EpH: ${item.eph}`;
 
-    return (
+    const content = (
       <TouchableOpacity
-        key={index}
         style={styles.historyItem}
         onPress={() => onItemPress(item)}
       >
@@ -117,12 +145,25 @@ export default function HistorySection({
         </View>
       </TouchableOpacity>
     );
+
+    if (onDeleteItem) {
+      return (
+        <Swipeable
+          key={index}
+          renderRightActions={() => renderDeleteAction(index)}
+          overshootRight={false}
+        >
+          {content}
+        </Swipeable>
+      );
+    }
+
+    return <View key={index}>{content}</View>;
   };
 
   const renderTrackHistoryItem = (item: TrackHistoryItem, index: number) => {
-    return (
+    const content = (
       <TouchableOpacity
-        key={index}
         style={styles.historyItem}
         onPress={() => onItemPress(item)}
       >
@@ -156,6 +197,20 @@ export default function HistorySection({
         </View>
       </TouchableOpacity>
     );
+
+    if (onDeleteItem) {
+      return (
+        <Swipeable
+          key={index}
+          renderRightActions={() => renderDeleteAction(index)}
+          overshootRight={false}
+        >
+          {content}
+        </Swipeable>
+      );
+    }
+
+    return <View key={index}>{content}</View>;
   };
 
   return (
@@ -326,6 +381,14 @@ function createStyles(isDark: boolean) {
     splitValue: {
       fontWeight: '700',
       color: isDark ? '#ffffff' : '#1e293b',
+    },
+    deleteAction: {
+      backgroundColor: '#ef4444',
+      justifyContent: 'center',
+      alignItems: 'center',
+      width: 80,
+      borderRadius: 8,
+      marginBottom: 8,
     },
   });
 }

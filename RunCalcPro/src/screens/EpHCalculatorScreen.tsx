@@ -23,11 +23,11 @@ import {
   saveEphHistory,
   loadEphHistory,
   clearEphHistory,
+  deleteEphHistoryItem,
   EpHHistoryItem,
 } from '../utils/storage';
 import { Language } from '../types';
-import LanguageSwitcher from '../components/LanguageSwitcher';
-import ThemeToggle from '../components/ThemeToggle';
+import Settings from '../components/Settings';
 import HistorySection from '../components/HistorySection';
 import { loadLanguage } from '../utils/storage';
 import '../i18n/i18nConfig';
@@ -157,16 +157,20 @@ export default function EpHCalculatorScreen() {
     await loadHistory();
   };
 
+  const handleDeleteItem = async (index: number) => {
+    await deleteEphHistoryItem(index);
+    await loadHistory();
+  };
+
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <View style={styles.header}>
-        <LanguageSwitcher
+        <Settings
           language={language}
           onLanguageChange={(lang) => {
             setLanguage(lang);
           }}
         />
-        <ThemeToggle />
       </View>
 
       <ScrollView

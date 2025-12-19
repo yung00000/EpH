@@ -6,6 +6,7 @@
 import React, { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { StatusBar } from 'expo-status-bar';
 import * as Updates from 'expo-updates';
 import AppNavigator from './src/navigation/AppNavigator';
@@ -16,6 +17,11 @@ export default function App() {
   useEffect(() => {
     async function onFetchUpdateAsync() {
       try {
+        // Check if updates are available (not available in Expo Go)
+        if (!Updates.isEnabled) {
+          return;
+        }
+
         const update = await Updates.checkForUpdateAsync();
 
         if (update.isAvailable) {
@@ -23,24 +29,27 @@ export default function App() {
           await Updates.reloadAsync();
         }
       } catch (error) {
-        console.error('Error fetching update:', error);
+        // Silently handle errors (e.g., in Expo Go where updates aren't available)
+        // Updates are not available in Expo Go, so errors are expected
       }
     }
 
-    // Only check for updates in production builds
-    if (!__DEV__) {
+    // Only check for updates in production builds (not in Expo Go)
+    if (!__DEV__ && Updates.isEnabled) {
       onFetchUpdateAsync();
     }
   }, []);
 
   return (
-    <ThemeProvider>
-      <SafeAreaProvider>
-        <NavigationContainer>
-          <AppNavigator />
-          <StatusBar style="auto" />
-        </NavigationContainer>
-      </SafeAreaProvider>
-    </ThemeProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <ThemeProvider>
+        <SafeAreaProvider>
+          <NavigationContainer>
+            <AppNavigator />
+            <StatusBar style="auto" />
+          </NavigationContainer>
+        </SafeAreaProvider>
+      </ThemeProvider>
+    </GestureHandlerRootView>
   );
 }

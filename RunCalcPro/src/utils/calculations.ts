@@ -127,6 +127,11 @@ export function calculateTrackTimes(paceSeconds: number) {
   // Time per 100 meters
   const splitSeconds = paceSeconds * splitDistanceKm;
   
+  // Calculate race distances
+  const time10km = paceSeconds * 10; // 10km
+  const timeHalfMarathon = paceSeconds * 21.0975; // Half marathon (21.0975km)
+  const timeMarathon = paceSeconds * 42.195; // Marathon (42.195km)
+  
   return {
     totalSeconds: Math.round(totalSeconds),
     totalMinutes,
@@ -135,7 +140,24 @@ export function calculateTrackTimes(paceSeconds: number) {
     split200m: Math.round(splitSeconds * 2),
     split300m: Math.round(splitSeconds * 3),
     split400m: Math.round(totalSeconds),
+    time10km: Math.round(time10km),
+    timeHalfMarathon: Math.round(timeHalfMarathon),
+    timeMarathon: Math.round(timeMarathon),
   };
+}
+
+/**
+ * Format time in seconds to HH:MM:SS format
+ */
+export function formatTimeLong(seconds: number): string {
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const secs = seconds % 60;
+  
+  if (hours > 0) {
+    return `${hours}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  }
+  return `${minutes}:${secs.toString().padStart(2, '0')}`;
 }
 
 /**

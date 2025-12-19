@@ -79,6 +79,22 @@ export async function clearEphHistory(): Promise<void> {
 }
 
 /**
+ * Delete a specific EpH history item by index
+ */
+export async function deleteEphHistoryItem(index: number): Promise<void> {
+  try {
+    const history = await loadEphHistory();
+    if (index >= 0 && index < history.length) {
+      const newHistory = history.filter((_, i) => i !== index);
+      await AsyncStorage.setItem(STORAGE_KEYS.EPH_HISTORY, JSON.stringify(newHistory));
+    }
+  } catch (error) {
+    console.error('Error deleting EpH history item:', error);
+    throw error;
+  }
+}
+
+/**
  * Save Track calculation history
  */
 export async function saveTrackHistory(item: TrackHistoryItem): Promise<void> {
@@ -116,6 +132,22 @@ export async function clearTrackHistory(): Promise<void> {
     await AsyncStorage.removeItem(STORAGE_KEYS.TRACK_HISTORY);
   } catch (error) {
     console.error('Error clearing Track history:', error);
+    throw error;
+  }
+}
+
+/**
+ * Delete a specific Track history item by index
+ */
+export async function deleteTrackHistoryItem(index: number): Promise<void> {
+  try {
+    const history = await loadTrackHistory();
+    if (index >= 0 && index < history.length) {
+      const newHistory = history.filter((_, i) => i !== index);
+      await AsyncStorage.setItem(STORAGE_KEYS.TRACK_HISTORY, JSON.stringify(newHistory));
+    }
+  } catch (error) {
+    console.error('Error deleting Track history item:', error);
     throw error;
   }
 }

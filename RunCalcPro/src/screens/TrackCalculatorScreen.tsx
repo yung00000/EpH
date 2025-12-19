@@ -17,16 +17,16 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { useNavigation } from '@react-navigation/native';
 import { useTheme } from '../contexts/ThemeContext';
-import { parsePace, calculateTrackTimes, formatTime, formatTimeMinSec } from '../utils/calculations';
+import { parsePace, calculateTrackTimes, formatTime, formatTimeMinSec, formatTimeLong } from '../utils/calculations';
 import {
   saveTrackHistory,
   loadTrackHistory,
   clearTrackHistory,
+  deleteTrackHistoryItem,
   TrackHistoryItem,
 } from '../utils/storage';
 import { Language } from '../types';
-import LanguageSwitcher from '../components/LanguageSwitcher';
-import ThemeToggle from '../components/ThemeToggle';
+import Settings from '../components/Settings';
 import HistorySection from '../components/HistorySection';
 import { loadLanguage } from '../utils/storage';
 import '../i18n/i18nConfig';
@@ -85,6 +85,9 @@ export default function TrackCalculatorScreen() {
         split_200m: times.split200m,
         split_300m: times.split300m,
         split_400m: times.split400m,
+        time10km: times.time10km,
+        timeHalfMarathon: times.timeHalfMarathon,
+        timeMarathon: times.timeMarathon,
       };
 
       setResult(resultData);
@@ -118,16 +121,20 @@ export default function TrackCalculatorScreen() {
     await loadHistory();
   };
 
+  const handleDeleteItem = async (index: number) => {
+    await deleteTrackHistoryItem(index);
+    await loadHistory();
+  };
+
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <View style={styles.header}>
-        <LanguageSwitcher
+        <Settings
           language={language}
           onLanguageChange={(lang) => {
             setLanguage(lang);
           }}
         />
-        <ThemeToggle />
       </View>
 
       <ScrollView
@@ -193,25 +200,41 @@ export default function TrackCalculatorScreen() {
 
         {result && (
           <View style={styles.resultCard}>
-            <Text style={styles.resultTitle}>{t('track.resultTitle')}</Text>
             <View style={styles.totalTimeContainer}>
-              <Text style={styles.totalTimeLabel}>{t('track.totalTime')}</Text>
-              <Text style={styles.totalTimeValue}>{result.total_time_min}</Text>
+              <Text style={styles.breakdownTitle}>{t('track.breakdownByDistance')}</Text>
+              <View style={styles.raceTimesContainer}>
+                <View style={[styles.raceTimeRow, styles.raceTimeRowBorder]}>
+                  <Text style={styles.raceTimeLabel}>{t('track.split400m')}</Text>
+                  <Text style={styles.totalTimeValue}>{result.total_time_min}</Text>
+                </View>
+                <View style={[styles.raceTimeRow, styles.raceTimeRowBorder]}>
+                  <Text style={styles.raceTimeLabel}>{t('track.race10km')}</Text>
+                  <Text style={styles.raceTimeValue}>{formatTimeLong(result.time10km)}</Text>
+                </View>
+                <View style={[styles.raceTimeRow, styles.raceTimeRowBorder]}>
+                  <Text style={styles.raceTimeLabel}>{t('track.raceHalfMarathon')}</Text>
+                  <Text style={styles.raceTimeValue}>{formatTimeLong(result.timeHalfMarathon)}</Text>
+                </View>
+                <View style={styles.raceTimeRow}>
+                  <Text style={styles.raceTimeLabel}>{t('track.raceMarathon')}</Text>
+                  <Text style={styles.raceTimeValue}>{formatTimeLong(result.timeMarathon)}</Text>
+                </View>
+              </View>
             </View>
             <View style={styles.splitsContainer}>
               <View style={styles.splitItem}>
                 <Text style={styles.splitLabel}>{t('track.split100m').toUpperCase()}</Text>
                 <Text style={styles.splitTime}>{formatTime(result.split_100m)}</Text>
               </View>
-              <View style={[styles.splitItem, styles.splitItemSpacing]}>
+              <View style={styles.splitItem}>
                 <Text style={styles.splitLabel}>{t('track.split200m').toUpperCase()}</Text>
                 <Text style={styles.splitTime}>{formatTime(result.split_200m)}</Text>
               </View>
-              <View style={[styles.splitItem, styles.splitItemSpacing]}>
+              <View style={styles.splitItem}>
                 <Text style={styles.splitLabel}>{t('track.split300m').toUpperCase()}</Text>
                 <Text style={styles.splitTime}>{formatTime(result.split_300m)}</Text>
               </View>
-              <View style={[styles.splitItem, styles.splitItemSpacing]}>
+              <View style={styles.splitItem}>
                 <Text style={styles.splitLabel}>{t('track.split400m').toUpperCase()}</Text>
                 <Text style={[styles.splitTime, styles.splitTime400m]}>
                   {formatTime(result.split_400m)}
@@ -225,6 +248,7 @@ export default function TrackCalculatorScreen() {
           history={history}
           onItemPress={fillFromHistory}
           onClear={handleClearHistory}
+          onDeleteItem={handleDeleteItem}
           language={language}
           type="track"
         />
@@ -326,31 +350,50 @@ function createStyles(isDark: boolean) {
       borderWidth: 1,
       borderColor: isDark ? '#334155' : '#e2e8f0',
     },
-    resultTitle: {
-      fontSize: 18,
-      fontWeight: '600',
-      color: isDark ? '#3b82f6' : '#2563eb',
-      marginBottom: 16,
-      textAlign: 'center',
-    },
     totalTimeContainer: {
       backgroundColor: isDark ? '#0f172a' : '#f8fafc',
       borderRadius: 8,
-      padding: 16,
+      padding: 20,
       marginBottom: 16,
-      borderWidth: 1,
+      borderWidth: 2,
+      borderLeftWidth: 4,
+      borderRightWidth: 4,
       borderColor: isDark ? '#34d399' : '#10b981',
-      alignItems: 'center',
     },
-    totalTimeLabel: {
+    breakdownTitle: {
       fontSize: 14,
+      fontWeight: '600',
       color: isDark ? '#94a3b8' : '#64748b',
-      marginBottom: 4,
+      marginBottom: 12,
+      textAlign: 'center',
     },
     totalTimeValue: {
       fontSize: 24,
       fontWeight: '700',
       color: isDark ? '#34d399' : '#10b981',
+    },
+    raceTimesContainer: {
+      width: '100%',
+    },
+    raceTimeRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingVertical: 6,
+    },
+    raceTimeRowBorder: {
+      borderBottomWidth: 1,
+      borderBottomColor: isDark ? '#334155' : '#e2e8f0',
+    },
+    raceTimeLabel: {
+      fontSize: 13,
+      color: isDark ? '#94a3b8' : '#64748b',
+      fontWeight: '500',
+    },
+    raceTimeValue: {
+      fontSize: 15,
+      fontWeight: '600',
+      color: isDark ? '#ffffff' : '#1e293b',
     },
     splitsContainer: {
       flexDirection: 'row',
@@ -362,12 +405,10 @@ function createStyles(isDark: boolean) {
       backgroundColor: isDark ? '#0f172a' : '#f8fafc',
       borderRadius: 8,
       padding: 12,
+      marginBottom: 8,
       borderWidth: 1,
       borderColor: isDark ? '#334155' : '#e2e8f0',
       alignItems: 'center',
-    },
-    splitItemSpacing: {
-      marginTop: 12,
     },
     splitLabel: {
       fontSize: 12,
