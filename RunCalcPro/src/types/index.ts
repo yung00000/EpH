@@ -1,5 +1,5 @@
 /**
- * TypeScript type definitions for RunCalc Pro
+ * TypeScript type definitions for RunCals Pro
  */
 
 /**

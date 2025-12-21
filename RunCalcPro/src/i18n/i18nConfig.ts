@@ -1,5 +1,5 @@
 /**
- * i18next configuration for RunCalc Pro
+ * i18next configuration for RunCals Pro
  */
 
 import i18n from 'i18next';

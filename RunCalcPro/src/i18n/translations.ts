@@ -1,5 +1,5 @@
 /**
- * Translation strings for RunCalc Pro
+ * Translation strings for RunCals Pro
  * Ported from Python FastAPI backend (app.py)
  */
 
