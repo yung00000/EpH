@@ -30,7 +30,7 @@ interface SettingsProps {
 
 export default function Settings({ language, onLanguageChange }: SettingsProps) {
   const { isDark, theme, setTheme } = useTheme();
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [modalVisible, setModalVisible] = useState(false);
   const [currentLanguage, setCurrentLanguage] = useState<Language>(language);
 
@@ -59,31 +59,29 @@ export default function Settings({ language, onLanguageChange }: SettingsProps) 
 
   const getThemeText = () => {
     if (theme === 'light') {
-      return currentLanguage === 'en' ? 'Light Mode' : '淺色模式';
+      return t('common.lightMode');
     } else if (theme === 'dark') {
-      return currentLanguage === 'en' ? 'Dark Mode' : '深色模式';
+      return t('common.darkMode');
     } else {
-      return currentLanguage === 'en' ? 'Automatic' : '自動';
+      return t('common.automatic');
     }
   };
 
   const handleContactUs = async () => {
     const email = 'admin@runcals.com';
     Alert.alert(
-      currentLanguage === 'en' ? 'Contact Us' : '聯絡我們',
+      t('common.contactUs'),
       email,
       [
-        { text: currentLanguage === 'en' ? 'Cancel' : '取消', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
         {
-          text: currentLanguage === 'en' ? 'Copy' : '複製',
+          text: t('common.copied'),
           onPress: async () => {
             await Clipboard.setStringAsync(email);
             Alert.alert(
-              currentLanguage === 'en' ? 'Copied!' : '已複製',
-              currentLanguage === 'en'
-                ? 'Email address copied to clipboard'
-                : '電子郵件地址已複製到剪貼簿',
-              [{ text: currentLanguage === 'en' ? 'OK' : '確定' }]
+              t('common.copied'),
+              t('common.emailCopied'),
+              [{ text: t('common.ok') }]
             );
           },
         },
@@ -98,7 +96,7 @@ export default function Settings({ language, onLanguageChange }: SettingsProps) 
       <TouchableOpacity
         style={styles.gearButton}
         onPress={() => setModalVisible(true)}
-        accessibilityLabel={currentLanguage === 'en' ? 'Open settings' : '開啟設定'}
+        accessibilityLabel={t('common.openSettings')}
       >
         <Ionicons
           name="settings-outline"
@@ -125,14 +123,14 @@ export default function Settings({ language, onLanguageChange }: SettingsProps) 
           >
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>
-                {currentLanguage === 'en' ? 'Settings' : '設定'}
+                {t('common.settings')}
               </Text>
               <TouchableOpacity
                 onPress={() => setModalVisible(false)}
                 style={styles.closeButton}
               >
                 <Ionicons
-                  name="close"
+                  name="close-outline"
                   size={24}
                   color={isDark ? '#ffffff' : '#1e293b'}
                 />
@@ -143,7 +141,7 @@ export default function Settings({ language, onLanguageChange }: SettingsProps) 
               {/* Language Switching */}
               <View style={styles.menuSection}>
                 <Text style={styles.menuSectionTitle}>
-                  {currentLanguage === 'en' ? 'Language Switching' : '語言切換'}
+                  {t('common.switchLanguage')}
                 </Text>
                 <View style={styles.menuItem}>
                   <LanguageSwitcher
@@ -156,7 +154,7 @@ export default function Settings({ language, onLanguageChange }: SettingsProps) 
               {/* Dark/Light Mode */}
               <View style={styles.menuSection}>
                 <Text style={styles.menuSectionTitle}>
-                  {currentLanguage === 'en' ? 'Theme' : '主題'}
+                  {t('common.switchTheme')}
                 </Text>
                 <TouchableOpacity
                   style={styles.menuItem}
@@ -164,7 +162,7 @@ export default function Settings({ language, onLanguageChange }: SettingsProps) 
                 >
                   <View style={styles.menuItemContent}>
                     <Ionicons
-                      name={isDark ? 'moon' : 'sunny'}
+                      name={isDark ? 'moon-outline' : 'sunny-outline'}
                       size={20}
                       color={isDark ? '#ffffff' : '#1e293b'}
                     />
@@ -181,7 +179,7 @@ export default function Settings({ language, onLanguageChange }: SettingsProps) 
               {/* App Version Info */}
               <View style={styles.menuSection}>
                 <Text style={styles.menuSectionTitle}>
-                  {currentLanguage === 'en' ? 'App Information' : '應用程式資訊'}
+                  {t('common.appInformation')}
                 </Text>
                 <View style={styles.menuItem}>
                   <View style={styles.menuItemContent}>
@@ -191,7 +189,7 @@ export default function Settings({ language, onLanguageChange }: SettingsProps) 
                       color={isDark ? '#ffffff' : '#1e293b'}
                     />
                     <Text style={styles.menuItemText}>
-                      {currentLanguage === 'en' ? 'Version' : '版本'}
+                      {t('common.version')}
                     </Text>
                   </View>
                   <Text style={styles.versionText}>{appVersion}</Text>
@@ -210,9 +208,7 @@ export default function Settings({ language, onLanguageChange }: SettingsProps) 
                       size={20}
                       color={isDark ? '#ffffff' : '#1e293b'}
                     />
-                    <Text style={styles.menuItemText}>
-                      {currentLanguage === 'en' ? 'Contact Us' : '聯絡我們'}
-                    </Text>
+                    <Text style={styles.menuItemText}>{t('common.contactUs')}</Text>
                   </View>
                   <Ionicons
                     name="chevron-forward"

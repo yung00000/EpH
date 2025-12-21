@@ -112,8 +112,31 @@ export default function TrackCalculatorScreen() {
 
   const fillFromHistory = (item: TrackHistoryItem) => {
     setPace(item.pace);
-    setResult(null);
     setError('');
+    
+    // Recalculate full results including 10km, half marathon, marathon
+    try {
+      const paceSeconds = parsePace(item.pace);
+      const times = calculateTrackTimes(paceSeconds);
+      const totalTimeStr = formatTimeMinSec(times.totalMinutes, times.totalRemSeconds);
+
+      const resultData = {
+        total_time_min: totalTimeStr,
+        total_time_sec: times.totalSeconds,
+        split_100m: times.split100m,
+        split_200m: times.split200m,
+        split_300m: times.split300m,
+        split_400m: times.split400m,
+        time10km: times.time10km,
+        timeHalfMarathon: times.timeHalfMarathon,
+        timeMarathon: times.timeMarathon,
+      };
+
+      setResult(resultData);
+    } catch (err: any) {
+      setError(err.message || t('track.errorPaceFormat'));
+      setResult(null);
+    }
   };
 
   const handleClearHistory = async () => {

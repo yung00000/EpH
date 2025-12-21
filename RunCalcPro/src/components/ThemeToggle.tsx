@@ -20,7 +20,7 @@ export default function ThemeToggle() {
       accessibilityLabel={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
     >
       <Ionicons
-        name={isDark ? 'sunny' : 'moon'}
+        name={isDark ? 'sunny-outline' : 'moon-outline'}
         size={16}
         color={isDark ? '#ffffff' : '#1e293b'}
       />
