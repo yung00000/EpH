@@ -152,19 +152,6 @@ export default function TrackCalculatorScreen() {
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <View style={styles.header}>
-        <Settings
-          language={language}
-          onLanguageChange={(lang) => {
-            setLanguage(lang);
-          }}
-        />
-      </View>
-
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.content}
-        showsVerticalScrollIndicator={false}
-      >
         <View style={styles.navContainer}>
           <TouchableOpacity
             style={styles.navButton}
@@ -181,6 +168,21 @@ export default function TrackCalculatorScreen() {
             </Text>
           </TouchableOpacity>
         </View>
+        <View style={styles.settingsWrapper}>
+          <Settings
+            language={language}
+            onLanguageChange={(lang) => {
+              setLanguage(lang);
+            }}
+          />
+        </View>
+      </View>
+
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+      >
 
         <View style={styles.titleContainer}>
           <Text style={styles.title}>{t('track.title')}</Text>
@@ -288,9 +290,19 @@ function createStyles(isDark: boolean) {
     },
     header: {
       flexDirection: 'row',
-      justifyContent: 'space-between',
+      justifyContent: 'flex-end',
       alignItems: 'center',
       padding: 16,
+      paddingBottom: 12,
+    },
+    navContainer: {
+      flexDirection: 'row',
+    },
+    settingsWrapper: {
+      marginLeft: 12,
+    },
+    navContainer: {
+      flexDirection: 'row',
     },
     scrollView: {
       flex: 1,
@@ -451,11 +463,6 @@ function createStyles(isDark: boolean) {
       fontWeight: '500',
       color: isDark ? '#f87171' : '#ef4444',
       textAlign: 'center',
-    },
-    navContainer: {
-      flexDirection: 'row',
-      justifyContent: 'center',
-      marginBottom: 16,
     },
     navButton: {
       paddingVertical: 8,

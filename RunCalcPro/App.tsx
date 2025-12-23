@@ -46,7 +46,7 @@ export default function App() {
         <SafeAreaProvider>
           <NavigationContainer>
             <AppNavigator />
-            <StatusBar style="auto" />
+      <StatusBar style="auto" />
           </NavigationContainer>
         </SafeAreaProvider>
       </ThemeProvider>

@@ -25,6 +25,7 @@ import {
   clearEphHistory,
   deleteEphHistoryItem,
   EpHHistoryItem,
+  TrackHistoryItem,
 } from '../utils/storage';
 import { Language } from '../types';
 import Settings from '../components/Settings';
@@ -165,19 +166,6 @@ export default function EpHCalculatorScreen() {
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <View style={styles.header}>
-        <Settings
-          language={language}
-          onLanguageChange={(lang) => {
-            setLanguage(lang);
-          }}
-        />
-      </View>
-
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.content}
-        showsVerticalScrollIndicator={false}
-      >
         <View style={styles.navContainer}>
           <TouchableOpacity
             style={[styles.navButton, styles.navButtonActive]}
@@ -194,6 +182,21 @@ export default function EpHCalculatorScreen() {
             <Text style={styles.navButtonText}>{t('common.trackCalculator')}</Text>
           </TouchableOpacity>
         </View>
+        <View style={styles.settingsWrapper}>
+          <Settings
+            language={language}
+            onLanguageChange={(lang) => {
+              setLanguage(lang);
+            }}
+          />
+        </View>
+      </View>
+
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+      >
 
         <View style={styles.titleContainer}>
           <Text style={styles.title}>{t('eph.title')}</Text>
@@ -321,8 +324,9 @@ export default function EpHCalculatorScreen() {
 
         <HistorySection
           history={history}
-          onItemPress={fillFromHistory}
+          onItemPress={fillFromHistory as (item: EpHHistoryItem | TrackHistoryItem) => void}
           onClear={handleClearHistory}
+          onDeleteItem={handleDeleteItem}
           language={language}
           type="eph"
         />
@@ -339,9 +343,16 @@ function createStyles(isDark: boolean) {
     },
     header: {
       flexDirection: 'row',
-      justifyContent: 'space-between',
+      justifyContent: 'flex-end',
       alignItems: 'center',
       padding: 16,
+      paddingBottom: 12,
+    },
+    navContainer: {
+      flexDirection: 'row',
+    },
+    settingsWrapper: {
+      marginLeft: 12,
     },
     scrollView: {
       flex: 1,
@@ -455,11 +466,6 @@ function createStyles(isDark: boolean) {
       fontSize: 16,
       fontWeight: '500',
       color: isDark ? '#f87171' : '#ef4444',
-    },
-    navContainer: {
-      flexDirection: 'row',
-      justifyContent: 'center',
-      marginBottom: 16,
     },
     navButton: {
       paddingVertical: 8,

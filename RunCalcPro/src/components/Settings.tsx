@@ -20,8 +20,9 @@ import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from './LanguageSwitcher';
 import { Language } from '../types';
 import { saveLanguage } from '../utils/storage';
+import Constants from 'expo-constants';
 // App version from app.json
-const APP_VERSION = '1.1.0';
+const APP_VERSION = Constants.expoConfig?.version || '1.2.0';
 
 interface SettingsProps {
   language: Language;
