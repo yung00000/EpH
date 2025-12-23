@@ -11,7 +11,7 @@ import uvicorn
 app = FastAPI(
     title="RunCals Pro",
     description="Professional EpH and 400m Track Calculator for running",
-    version="1.1.0"
+    version="1.2.0"
 )
 
 # Mount static files and templates

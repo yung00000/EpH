@@ -1,6 +1,6 @@
 {
   "name": "runcalcpro",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "main": "index.ts",
   "scripts": {
     "start": "expo start",
@@ -9,6 +9,7 @@
     "web": "expo start --web",
     "android:build": "expo run:android",
     "android:build:release": "expo run:android --variant release",
+    "android:build:aab": "cd android && .\\gradlew.bat bundleRelease && cd ..",
     "eas:build:local": "eas build --local --platform android --profile preview",
     "eas:build:aab": "eas build --platform android --profile production",
     "eas:build:apk": "eas build --platform android --profile preview"
