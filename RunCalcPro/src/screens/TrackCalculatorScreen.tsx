@@ -167,14 +167,14 @@ export default function TrackCalculatorScreen() {
               {t('common.trackCalculator')}
             </Text>
           </TouchableOpacity>
-        </View>
-        <View style={styles.settingsWrapper}>
-          <Settings
-            language={language}
-            onLanguageChange={(lang) => {
-              setLanguage(lang);
-            }}
-          />
+          <View style={styles.settingsWrapper}>
+            <Settings
+              language={language}
+              onLanguageChange={(lang) => {
+                setLanguage(lang);
+              }}
+            />
+          </View>
         </View>
       </View>
 
@@ -183,12 +183,6 @@ export default function TrackCalculatorScreen() {
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-
-        <View style={styles.titleContainer}>
-          <Text style={styles.title}>{t('track.title')}</Text>
-          <Text style={styles.subtitle}>{t('track.subtitle')}</Text>
-        </View>
-
         <View style={styles.card}>
           <Text style={styles.cardTitle}>{t('track.title')}</Text>
 
@@ -297,12 +291,10 @@ function createStyles(isDark: boolean) {
     },
     navContainer: {
       flexDirection: 'row',
+      alignItems: 'center',
     },
     settingsWrapper: {
       marginLeft: 12,
-    },
-    navContainer: {
-      flexDirection: 'row',
     },
     scrollView: {
       flex: 1,

@@ -39,7 +39,7 @@ export default function EpHCalculatorScreen() {
   const navigation = useNavigation();
 
   const [language, setLanguage] = useState<Language>('zh');
-  const [mode, setMode] = useState<'eph' | 'time' | ''>('');
+  const [mode, setMode] = useState<'eph' | 'time' | ''>('eph');
   const [distance, setDistance] = useState('');
   const [elevation, setElevation] = useState('');
   const [time, setTime] = useState('');
@@ -181,14 +181,14 @@ export default function EpHCalculatorScreen() {
           >
             <Text style={styles.navButtonText}>{t('common.trackCalculator')}</Text>
           </TouchableOpacity>
-        </View>
-        <View style={styles.settingsWrapper}>
-          <Settings
-            language={language}
-            onLanguageChange={(lang) => {
-              setLanguage(lang);
-            }}
-          />
+          <View style={styles.settingsWrapper}>
+            <Settings
+              language={language}
+              onLanguageChange={(lang) => {
+                setLanguage(lang);
+              }}
+            />
+          </View>
         </View>
       </View>
 
@@ -197,12 +197,6 @@ export default function EpHCalculatorScreen() {
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-
-        <View style={styles.titleContainer}>
-          <Text style={styles.title}>{t('eph.title')}</Text>
-          <Text style={styles.subtitle}>{t('eph.subtitle')}</Text>
-        </View>
-
         <View style={styles.card}>
           <Text style={styles.cardTitle}>{t('eph.title')}</Text>
 
@@ -350,6 +344,7 @@ function createStyles(isDark: boolean) {
     },
     navContainer: {
       flexDirection: 'row',
+      alignItems: 'center',
     },
     settingsWrapper: {
       marginLeft: 12,
