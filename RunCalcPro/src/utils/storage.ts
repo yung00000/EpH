@@ -42,7 +42,7 @@ export interface TrackHistoryItem {
 export async function saveEphHistory(item: EpHHistoryItem): Promise<void> {
   try {
     const history = await loadEphHistory();
-    const newHistory = [item, ...history].slice(0, 10); // Keep last 10 items
+    const newHistory = [item, ...history].slice(0, 20); // Keep last 20 items
     await AsyncStorage.setItem(STORAGE_KEYS.EPH_HISTORY, JSON.stringify(newHistory));
   } catch (error) {
     console.error('Error saving EpH history:', error);
@@ -100,7 +100,7 @@ export async function deleteEphHistoryItem(index: number): Promise<void> {
 export async function saveTrackHistory(item: TrackHistoryItem): Promise<void> {
   try {
     const history = await loadTrackHistory();
-    const newHistory = [item, ...history].slice(0, 10); // Keep last 10 items
+    const newHistory = [item, ...history].slice(0, 20); // Keep last 20 items
     await AsyncStorage.setItem(STORAGE_KEYS.TRACK_HISTORY, JSON.stringify(newHistory));
   } catch (error) {
     console.error('Error saving Track history:', error);

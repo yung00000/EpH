@@ -9,7 +9,7 @@ import {
   Text,
   TouchableOpacity,
   StyleSheet,
-  ScrollView,
+  FlatList,
   Alert,
 } from 'react-native';
 import { Swipeable } from 'react-native-gesture-handler';
@@ -149,7 +149,6 @@ export default function HistorySection({
     if (onDeleteItem) {
       return (
         <Swipeable
-          key={index}
           renderRightActions={() => renderDeleteAction(index)}
           overshootRight={false}
         >
@@ -158,7 +157,7 @@ export default function HistorySection({
       );
     }
 
-    return <View key={index}>{content}</View>;
+    return <View>{content}</View>;
   };
 
   const renderTrackHistoryItem = (item: TrackHistoryItem, index: number) => {
@@ -201,7 +200,6 @@ export default function HistorySection({
     if (onDeleteItem) {
       return (
         <Swipeable
-          key={index}
           renderRightActions={() => renderDeleteAction(index)}
           overshootRight={false}
         >
@@ -210,7 +208,7 @@ export default function HistorySection({
       );
     }
 
-    return <View key={index}>{content}</View>;
+    return <View>{content}</View>;
   };
 
   return (
@@ -223,6 +221,7 @@ export default function HistorySection({
             color={isDark ? '#ffffff' : '#1e293b'}
           />
           <Text style={[styles.title, styles.titleSpacing]}>{t.title}</Text>
+          <Text style={styles.countText}> ({history.length}/20)</Text>
         </View>
         {history.length > 0 && (
           <TouchableOpacity style={styles.clearButton} onPress={handleClear}>
@@ -237,15 +236,24 @@ export default function HistorySection({
           <Text style={styles.emptyText}>{t.noHistory}</Text>
         </View>
       ) : (
-        <ScrollView style={styles.historyList}>
-          {type === 'eph'
-            ? (history as EpHHistoryItem[]).map((item, index) =>
-                renderEphHistoryItem(item, index)
-              )
-            : (history as TrackHistoryItem[]).map((item, index) =>
-                renderTrackHistoryItem(item, index)
-              )}
-        </ScrollView>
+        <FlatList
+          data={history}
+          style={styles.historyList}
+          scrollEnabled={false}
+          nestedScrollEnabled={false}
+          showsVerticalScrollIndicator={false}
+          keyExtractor={(item, index) => {
+            // Use timestamp + index as unique key
+            const historyItem = item as EpHHistoryItem | TrackHistoryItem;
+            return `${historyItem.timestamp}-${index}`;
+          }}
+          renderItem={({ item, index }) => {
+            return type === 'eph'
+              ? renderEphHistoryItem(item as EpHHistoryItem, index)
+              : renderTrackHistoryItem(item as TrackHistoryItem, index);
+          }}
+          removeClippedSubviews={false}
+        />
       )}
     </View>
   );
@@ -282,6 +290,12 @@ function createStyles(isDark: boolean) {
     titleSpacing: {
       marginLeft: 8,
     },
+    countText: {
+      fontSize: 14,
+      fontWeight: '500',
+      color: isDark ? '#94a3b8' : '#64748b',
+      marginLeft: 4,
+    },
     clearButton: {
       flexDirection: 'row',
       alignItems: 'center',
@@ -302,7 +316,7 @@ function createStyles(isDark: boolean) {
       fontStyle: 'italic',
     },
     historyList: {
-      maxHeight: 400,
+      flexGrow: 0,
     },
     historyItem: {
       backgroundColor: isDark ? '#0f172a' : '#f8fafc',

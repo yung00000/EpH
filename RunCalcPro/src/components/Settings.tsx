@@ -12,8 +12,10 @@ import {
   Modal,
   ScrollView,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
+import * as Updates from 'expo-updates';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../contexts/ThemeContext';
 import { useTranslation } from 'react-i18next';
@@ -34,6 +36,8 @@ export default function Settings({ language, onLanguageChange }: SettingsProps) 
   const { t, i18n } = useTranslation();
   const [modalVisible, setModalVisible] = useState(false);
   const [currentLanguage, setCurrentLanguage] = useState<Language>(language);
+  const [isCheckingUpdate, setIsCheckingUpdate] = useState(false);
+  const [updateAvailable, setUpdateAvailable] = useState(false);
 
   useEffect(() => {
     setCurrentLanguage(language);
@@ -88,6 +92,76 @@ export default function Settings({ language, onLanguageChange }: SettingsProps) 
         },
       ]
     );
+  };
+
+  const handleCheckForUpdate = async () => {
+    // Only works in production builds, not Expo Go
+    if (!Updates.isEnabled) {
+      Alert.alert(
+        t('common.updateNotAvailable'),
+        t('common.updateNotAvailableMessage'),
+        [{ text: t('common.ok') }]
+      );
+      return;
+    }
+
+    setIsCheckingUpdate(true);
+    try {
+      const update = await Updates.checkForUpdateAsync();
+      
+      if (update.isAvailable) {
+        setUpdateAvailable(true);
+        Alert.alert(
+          t('common.updateAvailable'),
+          t('common.updateAvailableMessage'),
+          [
+            { text: t('common.cancel'), style: 'cancel' },
+            {
+              text: t('common.downloadUpdate'),
+              onPress: async () => {
+                try {
+                  await Updates.fetchUpdateAsync();
+                  Alert.alert(
+                    t('common.updateDownloaded'),
+                    t('common.updateDownloadedMessage'),
+                    [
+                      {
+                        text: t('common.restartNow'),
+                        onPress: async () => {
+                          await Updates.reloadAsync();
+                        },
+                      },
+                      { text: t('common.later'), style: 'cancel' },
+                    ]
+                  );
+                } catch (error) {
+                  Alert.alert(
+                    t('common.updateError'),
+                    t('common.updateErrorMessage'),
+                    [{ text: t('common.ok') }]
+                  );
+                }
+              },
+            },
+          ]
+        );
+      } else {
+        Alert.alert(
+          t('common.noUpdateAvailable'),
+          t('common.noUpdateAvailableMessage'),
+          [{ text: t('common.ok') }]
+        );
+      }
+    } catch (error) {
+      Alert.alert(
+        t('common.updateError'),
+        t('common.updateErrorMessage'),
+        [{ text: t('common.ok') }]
+      );
+    } finally {
+      setIsCheckingUpdate(false);
+      setUpdateAvailable(false);
+    }
   };
 
   const styles = createStyles(isDark);
@@ -195,6 +269,45 @@ export default function Settings({ language, onLanguageChange }: SettingsProps) 
                   </View>
                   <Text style={styles.versionText}>{appVersion}</Text>
                 </View>
+              </View>
+
+              {/* Check for Updates */}
+              <View style={styles.menuSection}>
+                <Text style={styles.menuSectionTitle}>
+                  {t('common.updates')}
+                </Text>
+                <TouchableOpacity
+                  style={styles.menuItem}
+                  onPress={handleCheckForUpdate}
+                  disabled={isCheckingUpdate}
+                >
+                  <View style={styles.menuItemContent}>
+                    {isCheckingUpdate ? (
+                      <ActivityIndicator
+                        size="small"
+                        color={isDark ? '#3b82f6' : '#2563eb'}
+                      />
+                    ) : (
+                      <Ionicons
+                        name="refresh-outline"
+                        size={20}
+                        color={isDark ? '#ffffff' : '#1e293b'}
+                      />
+                    )}
+                    <Text style={styles.menuItemText}>
+                      {isCheckingUpdate
+                        ? t('common.checkingForUpdate')
+                        : t('common.checkForUpdate')}
+                    </Text>
+                  </View>
+                  {!isCheckingUpdate && (
+                    <Ionicons
+                      name="chevron-forward"
+                      size={20}
+                      color={isDark ? '#94a3b8' : '#64748b'}
+                    />
+                  )}
+                </TouchableOpacity>
               </View>
 
               {/* Contact Us */}

@@ -1,4 +1,4 @@
-# EpH Calculator Suite
+# RunCals Pro
 
 A comprehensive suite of professional calculators for running and cycling performance analysis, available as both a **web application** (FastAPI) and a **mobile app** (React Native Expo).
 
@@ -144,9 +144,11 @@ docker run -p 8080:8080 eph-calculator
 #### EpH Calculator
 - ✅ Calculate EpH from distance, elevation, and time
 - ✅ Calculate estimated completion time from EpH
+- ✅ Default mode: "Calculate EpH" (auto-selected)
 - ✅ Bilingual support (English/Traditional Chinese)
 - ✅ Dark/Light/Automatic theme support
-- ✅ Calculation history with swipe-to-delete
+- ✅ Calculation history with swipe-to-delete (up to 20 records)
+- ✅ History count display (X/20 format)
 - ✅ Input validation and error handling
 
 #### 400m Track Calculator
@@ -155,7 +157,8 @@ docker run -p 8080:8080 eph-calculator
 - ✅ Calculate 10km, Half Marathon, and Marathon times
 - ✅ Bilingual support (English/Traditional Chinese)
 - ✅ Dark/Light/Automatic theme support
-- ✅ Calculation history with swipe-to-delete
+- ✅ Calculation history with swipe-to-delete (up to 20 records)
+- ✅ History count display (X/20 format)
 - ✅ Input validation and error handling
 
 #### Settings Menu
@@ -169,6 +172,7 @@ docker run -p 8080:8080 eph-calculator
 - ✅ Persistent local storage (AsyncStorage)
 - ✅ Native navigation with React Navigation
 - ✅ Gesture support (swipe-to-delete)
+- ✅ FlatList for optimized history rendering (up to 20 records)
 - ✅ Responsive design for all screen sizes
 
 ### Technology Stack
@@ -410,9 +414,14 @@ Key dependencies:
 
 ### Version 1.1.0 (Current)
 - ✅ Mobile app migration to React Native Expo
+- ✅ App name updated to "RunCals Pro"
 - ✅ OTA updates configured
 - ✅ Settings menu with gear icon
 - ✅ Swipe-to-delete for history items
+- ✅ History limit increased to 20 records (from 10)
+- ✅ History count display (X/20 format)
+- ✅ FlatList implementation for optimized history rendering
+- ✅ Default mode: "Calculate EpH" auto-selected
 - ✅ Enhanced 400m calculator with race times
 - ✅ Clipboard support for contact email
 - ✅ Improved UI/UX for both platforms

@@ -201,7 +201,6 @@ export default function EpHCalculatorScreen() {
           <Text style={styles.cardTitle}>{t('eph.title')}</Text>
 
           <View style={styles.formGroup}>
-            <Text style={styles.label}>{t('eph.modeLabel')}</Text>
             <View style={styles.modeContainer}>
               <TouchableOpacity
                 style={[styles.modeButton, mode === 'eph' ? styles.modeButtonActive : null]}
