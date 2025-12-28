@@ -179,3 +179,33 @@ export function formatTimeMinSec(minutes: number, seconds: number): string {
   return `${minutes}:${seconds.toString().padStart(2, '0')}`;
 }
 
+/**
+ * Calculate pace from completed time and distance
+ * @param timeStr Time in hh:mm:ss or hh:mm format
+ * @param distanceKm Distance in kilometers (10, 21.0975, or 42.195)
+ * @returns Pace in seconds per kilometer
+ */
+export function calculatePaceFromTime(timeStr: string, distanceKm: number): number {
+  const hours = hmsToHours(timeStr);
+  if (hours <= 0) {
+    throw new Error("Time must be greater than 0");
+  }
+  if (distanceKm <= 0) {
+    throw new Error("Distance must be greater than 0");
+  }
+  
+  const totalSeconds = hours * 3600;
+  const paceSecondsPerKm = totalSeconds / distanceKm;
+  
+  return Math.round(paceSecondsPerKm);
+}
+
+/**
+ * Format pace from seconds to M:SS format
+ */
+export function formatPace(paceSeconds: number): string {
+  const minutes = Math.floor(paceSeconds / 60);
+  const seconds = paceSeconds % 60;
+  return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+}
+

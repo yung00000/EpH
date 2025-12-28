@@ -34,6 +34,9 @@ export interface TrackHistoryItem {
   split_300m: number;
   split_400m: number;
   timestamp: string;
+  mode?: 'paceToTime' | 'timeToPace'; // Optional: track calculation mode
+  distance?: '10km' | 'halfMarathon' | 'marathon'; // Optional: for timeToPace mode
+  completedTime?: string; // Optional: for timeToPace mode
 }
 
 /**

@@ -161,6 +161,16 @@ export default function HistorySection({
   };
 
   const renderTrackHistoryItem = (item: TrackHistoryItem, index: number) => {
+    const getDistanceLabel = (distance?: string) => {
+      if (!distance) return '';
+      const labels: { [key: string]: { en: string; zh: string } } = {
+        '10km': { en: '10km', zh: '10公里' },
+        'halfMarathon': { en: 'Half Marathon', zh: '半程馬拉松' },
+        'marathon': { en: 'Marathon', zh: '全程馬拉松' },
+      };
+      return labels[distance]?.[language] || distance;
+    };
+
     const content = (
       <TouchableOpacity
         style={styles.historyItem}
@@ -168,13 +178,26 @@ export default function HistorySection({
       >
         <View style={styles.historyContent}>
           <View style={styles.historyHeader}>
-            <View style={[styles.modeBadge, styles.modeBadgeTrack]}>
-              <Text style={[styles.modeBadgeText, styles.modeBadgeTextTrack]}>
+            <View style={[
+              styles.modeBadge,
+              item.mode === 'timeToPace' ? styles.modeBadgeTimeToPace : styles.modeBadgeTrack
+            ]}>
+              <Text style={[
+                styles.modeBadgeText,
+                item.mode === 'timeToPace' ? styles.modeBadgeTextTimeToPace : styles.modeBadgeTextTrack
+              ]}>
                 {item.pace} min/km
               </Text>
             </View>
             <Text style={styles.timestamp}>{item.timestamp}</Text>
           </View>
+          {item.mode === 'timeToPace' && item.distance && item.completedTime && (
+            <View style={styles.timeToPaceInfo}>
+              <Text style={styles.timeToPaceText}>
+                {language === 'en' ? 'From' : '來自'} {getDistanceLabel(item.distance)}: {item.completedTime}
+              </Text>
+            </View>
+          )}
           <View style={styles.trackSplits}>
             <Text style={styles.splitText}>
               {language === 'en' ? '100m' : '100米'}:{' '}
@@ -348,6 +371,9 @@ function createStyles(isDark: boolean) {
     modeBadgeTrack: {
       backgroundColor: isDark ? 'rgba(16, 185, 129, 0.2)' : 'rgba(16, 185, 129, 0.1)',
     },
+    modeBadgeTimeToPace: {
+      backgroundColor: isDark ? 'rgba(59, 130, 246, 0.2)' : 'rgba(37, 99, 235, 0.1)',
+    },
     modeBadgeText: {
       fontSize: 11,
       fontWeight: '600',
@@ -360,6 +386,9 @@ function createStyles(isDark: boolean) {
     },
     modeBadgeTextTrack: {
       color: isDark ? '#34d399' : '#10b981',
+    },
+    modeBadgeTextTimeToPace: {
+      color: isDark ? '#60a5fa' : '#2563eb',
     },
     timestamp: {
       fontSize: 11,
@@ -390,7 +419,15 @@ function createStyles(isDark: boolean) {
     },
     splitText400m: {
       fontWeight: '600',
-      color: isDark ? '#34d399' : '#10b981',
+    },
+    timeToPaceInfo: {
+      marginTop: 6,
+      marginBottom: 4,
+    },
+    timeToPaceText: {
+      fontSize: 11,
+      color: isDark ? '#60a5fa' : '#2563eb',
+      fontStyle: 'italic',
     },
     splitValue: {
       fontWeight: '700',
