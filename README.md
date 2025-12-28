@@ -5,7 +5,7 @@ A comprehensive suite of professional calculators for running and cycling perfor
 ## 📱 Applications
 
 1. **EpH Calculator** - Calculate Effort Points per Hour for running/cycling
-2. **400m Track Calculator** - Specialized calculator for 400m track time and split calculations
+2. **Pacing Calculator** - Calculate pace from time or time from pace for 10km, Half Marathon, and Marathon
 
 ## 🚀 Available Platforms
 
@@ -33,14 +33,17 @@ A comprehensive suite of professional calculators for running and cycling perfor
 - **Real-time Validation**: Input validation and error handling
 - **Mobile-First Design**: Compact, space-efficient design optimized for mobile devices
 
-#### 400m Track Calculator
+#### Pacing Calculator
+- **Dual Calculation Modes**: 
+  - **Pace to Time**: Enter pace to calculate 400m time, splits, and race times
+  - **Time to Pace**: Enter completed time for 10km/Half Marathon/Marathon to calculate pace
 - **Pace Input**: Enter pace in min:sec per km format (e.g., 4:30, 7:00)
 - **400m Total Time**: Calculate total time to complete 400m with compact display
 - **Split Times**: Calculate split times for 100m, 200m, 300m, and 400m in horizontal layout
 - **Race Times**: Calculate 10km, Half Marathon, and Marathon completion times
 - **Formula-based**: Uses exact formulas for accurate calculations
 - **Professional UI**: Consistent design language with the EpH calculator
-- **Calculation History**: Local storage for tracking previous calculations
+- **Calculation History**: Local storage for tracking previous calculations (both modes)
 - **Real-time Validation**: Input validation and error handling
 - **Mobile-First Design**: Compact, space-efficient UI optimized for mobile devices
 
@@ -57,10 +60,11 @@ Where:
 - Elevation is in meters
 - Time is in hours
 
-### 400m Track Calculator Formulas
+### Pacing Calculator Formulas
 
-The 400m calculator uses the exact formulas:
+The Pacing Calculator uses the exact formulas:
 
+#### Pace to Time Mode
 - **Input**: Pace in min:sec per km (e.g., "4:30")
 - **Convert Pace to seconds**: `(minutes * 60) + seconds`
 - **400m Total Time**: `pace_seconds * 0.4` (since 400m = 0.4 km)
@@ -70,6 +74,15 @@ The 400m calculator uses the exact formulas:
   - 200m: `split_100m * 2`
   - 300m: `split_100m * 3`
   - 400m: `total_seconds`
+- **Race Times**:
+  - 10km: `pace_seconds * 10`
+  - Half Marathon: `pace_seconds * 21.0975`
+  - Marathon: `pace_seconds * 42.195`
+
+#### Time to Pace Mode
+- **Input**: Completed time (hh:mm:ss or hh:mm) and distance (10km/Half Marathon/Marathon)
+- **Calculate Pace**: `pace_seconds_per_km = total_time_seconds / distance_km`
+- **Then calculate**: All split times and race times using the calculated pace
 
 ### Technology Stack
 
@@ -113,7 +126,7 @@ python app.py
 
 **Access URLs:**
 - EpH Calculator: `http://localhost:8080`
-- 400m Track Calculator: `http://localhost:8080/track`
+- Pacing Calculator: `http://localhost:8080/track`
 
 #### Docker Deployment
 
@@ -130,7 +143,7 @@ docker run -p 8080:8080 eph-calculator
 ### API Endpoints
 
 - `GET /`: EpH Calculator interface
-- `GET /track`: 400m Track Calculator interface
+- `GET /track`: Pacing Calculator interface
 - `POST /calculate`: Calculate EpH or estimated time
 - `POST /track/calculate`: Calculate 400m time and splits from pace
 - `GET /health`: Health check endpoint
@@ -151,14 +164,17 @@ docker run -p 8080:8080 eph-calculator
 - ✅ History count display (X/20 format)
 - ✅ Input validation and error handling
 
-#### 400m Track Calculator
-- ✅ Calculate 400m time and splits from pace
+#### Pacing Calculator
+- ✅ **Dual Calculation Modes**:
+  - **Pace to Time**: Calculate 400m time, splits, and race times from pace
+  - **Time to Pace**: Calculate pace from completed time (10km/Half Marathon/Marathon)
 - ✅ Display split times for 100m, 200m, 300m, 400m
 - ✅ Calculate 10km, Half Marathon, and Marathon times
 - ✅ Bilingual support (English/Traditional Chinese)
 - ✅ Dark/Light/Automatic theme support
 - ✅ Calculation history with swipe-to-delete (up to 20 records)
 - ✅ History count display (X/20 format)
+- ✅ Color-coded history badges (blue for Time to Pace, green for Pace to Time)
 - ✅ Input validation and error handling
 
 #### Settings Menu
@@ -166,6 +182,7 @@ docker run -p 8080:8080 eph-calculator
 - ✅ Dark/Light mode toggle
 - ✅ App version information
 - ✅ Contact Us (copy email to clipboard)
+- ✅ Check for Updates (OTA update functionality)
 
 #### Additional Features
 - ✅ Over-The-Air (OTA) updates via Expo Updates
@@ -333,12 +350,24 @@ See `RunCalcPro/LOCAL_BUILD_GUIDE.md` for local build setup and troubleshooting.
 4. Enter target EpH value
 5. Click "Calculate"
 
-### 400m Track Calculator
+### Pacing Calculator
 
-#### Calculating 400m Time and Splits
-1. Enter your pace in min:sec per km format (e.g., 4:30, 7:00)
-2. Click "Calculate"
-3. View results:
+#### Pace to Time Mode
+1. Select "Pace to Time" mode
+2. Enter your pace in min:sec per km format (e.g., 4:30, 7:00)
+3. Click "Calculate"
+4. View results:
+   - Total time for 400m
+   - Split times for 100m, 200m, 300m, and 400m
+   - 10km, Half Marathon, and Marathon completion times
+
+#### Time to Pace Mode
+1. Select "Time to Pace" mode
+2. Select distance (10km, Half Marathon, or Marathon)
+3. Enter completed time (format: hh:mm:ss or hh:mm, e.g., 1:30:00 or 1:30)
+4. Click "Calculate"
+5. View results:
+   - Calculated pace per kilometer
    - Total time for 400m
    - Split times for 100m, 200m, 300m, and 400m
    - 10km, Half Marathon, and Marathon completion times
@@ -412,7 +441,16 @@ Key dependencies:
 
 ## 📝 Version History
 
-### Version 1.1.0 (Current)
+### Version 1.2.0 (Current)
+- ✅ **Pacing Calculator** renamed from "400m Track Calculator"
+- ✅ **Time to Pace mode**: Calculate pace from completed time (10km/Half Marathon/Marathon)
+- ✅ **Dual calculation modes**: Switch between "Pace to Time" and "Time to Pace"
+- ✅ **History for Time to Pace**: All calculations saved to history
+- ✅ **Color-coded history badges**: Blue for Time to Pace, green for Pace to Time
+- ✅ **Check for Updates**: OTA update button in Settings menu
+- ✅ Improved UI with mode selector and distance buttons
+
+### Version 1.1.0
 - ✅ Mobile app migration to React Native Expo
 - ✅ App name updated to "RunCals Pro"
 - ✅ OTA updates configured
@@ -422,7 +460,7 @@ Key dependencies:
 - ✅ History count display (X/20 format)
 - ✅ FlatList implementation for optimized history rendering
 - ✅ Default mode: "Calculate EpH" auto-selected
-- ✅ Enhanced 400m calculator with race times
+- ✅ Enhanced pacing calculator with race times
 - ✅ Clipboard support for contact email
 - ✅ Improved UI/UX for both platforms
 
@@ -458,6 +496,6 @@ For questions or support:
 
 ---
 
-**Version**: 1.1.0  
+**Version**: 1.2.0  
 **Status**: Production Ready  
 **Last Updated**: December 2024
