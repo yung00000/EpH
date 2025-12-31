@@ -268,19 +268,34 @@ export default function TrackCalculatorScreen() {
     setArticlesLoading(true);
     setArticlesError('');
     try {
-      const response = await fetch('https://api-articles.runcals.com/all-articles', {
+      const apiBaseUrl = process.env.EXPO_PUBLIC_API_BASE_URL || 'https://api-articles.runcals.com';
+      const apiKey = process.env.EXPO_PUBLIC_API_KEY || 'L0IUJK-_bBaKm1DOSI-3kxAfv9pbTuvsnsllQsnluFU';
+      
+      console.log('API Base URL:', apiBaseUrl);
+      console.log('API Key exists:', !!apiKey);
+      console.log('API Key length:', apiKey?.length);
+      
+      const response = await fetch(`${apiBaseUrl}/all-articles`, {
+        method: 'GET',
         headers: {
-          'X-API-Key': 'L0lUJk-_bBaKm1DOSI-3kxAfv9pbTuvsnsIlQsnIuF',
+          'X-API-Key': apiKey,
+          'Content-Type': 'application/json',
         },
       });
       
+      console.log('Response status:', response.status);
+      
       if (!response.ok) {
-        throw new Error('Failed to fetch articles');
+        const errorText = await response.text();
+        console.log('Error response:', errorText);
+        throw new Error(`Failed to fetch articles: ${response.status}`);
       }
       
       const data = await response.json();
+      console.log('Articles fetched:', data.articles?.length || 0);
       setArticles(data.articles || []);
     } catch (err: any) {
+      console.error('Fetch error:', err);
       setArticlesError(err.message || t('common.fetchError'));
       setArticles([]);
     } finally {

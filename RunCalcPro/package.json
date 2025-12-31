@@ -9,6 +9,7 @@
     "web": "expo start --web",
     "android:build": "expo run:android",
     "android:build:release": "expo run:android --variant release",
+    "android:install": "powershell -ExecutionPolicy Bypass -File install-apk.ps1",
     "android:build:aab": "cd android && .\\gradlew.bat bundleRelease && cd ..",
     "eas:build:local": "eas build --local --platform android --profile preview",
     "eas:build:aab": "eas build --platform android --profile production",
