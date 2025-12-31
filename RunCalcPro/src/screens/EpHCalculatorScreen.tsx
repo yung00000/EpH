@@ -13,6 +13,7 @@ import {
   StyleSheet,
   ActivityIndicator,
   Alert,
+  Modal,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
@@ -48,6 +49,12 @@ export default function EpHCalculatorScreen() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [history, setHistory] = useState<EpHHistoryItem[]>([]);
+  const [showMenu, setShowMenu] = useState(false);
+  const [showTips, setShowTips] = useState(false);
+  const [showRunningTips, setShowRunningTips] = useState(false);
+  const [articles, setArticles] = useState<any[]>([]);
+  const [articlesLoading, setArticlesLoading] = useState(false);
+  const [articlesError, setArticlesError] = useState('');
 
   const styles = createStyles(isDark);
 
@@ -163,9 +170,39 @@ export default function EpHCalculatorScreen() {
     await loadHistory();
   };
 
+  const fetchRunningArticles = async () => {
+    setArticlesLoading(true);
+    setArticlesError('');
+    try {
+      const response = await fetch('https://api-articles.runcals.com/all-articles', {
+        headers: {
+          'X-API-Key': 'L0lUJk-_bBaKm1DOSI-3kxAfv9pbTuvsnsIlQsnIuF',
+        },
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch articles');
+      }
+      
+      const data = await response.json();
+      setArticles(data.articles || []);
+    } catch (err: any) {
+      setArticlesError(err.message || t('common.fetchError'));
+      setArticles([]);
+    } finally {
+      setArticlesLoading(false);
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <View style={styles.header}>
+        <TouchableOpacity
+          style={styles.menuButton}
+          onPress={() => setShowMenu(true)}
+        >
+          <Text style={styles.menuButtonText}>⋮</Text>
+        </TouchableOpacity>
         <View style={styles.navContainer}>
           <TouchableOpacity
             style={[styles.navButton, styles.navButtonActive]}
@@ -324,6 +361,148 @@ export default function EpHCalculatorScreen() {
           type="eph"
         />
       </ScrollView>
+
+      {/* Menu Modal */}
+      <Modal
+        visible={showMenu}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowMenu(false)}
+      >
+        <TouchableOpacity
+          style={styles.menuOverlay}
+          activeOpacity={1}
+          onPress={() => setShowMenu(false)}
+        >
+          <View style={styles.menuModal}>
+            <TouchableOpacity
+              style={styles.menuItem}
+              onPress={() => {
+                setShowMenu(false);
+                setShowTips(true);
+              }}
+            >
+              <Text style={styles.menuItemText}>{t('common.tips')}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.menuItem, styles.menuItemLast]}
+              onPress={async () => {
+                setShowMenu(false);
+                setShowRunningTips(true);
+                await fetchRunningArticles();
+              }}
+            >
+              <Text style={styles.menuItemText}>{t('common.runningTips')}</Text>
+            </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
+      </Modal>
+
+      {/* Tips Modal */}
+      <Modal
+        visible={showTips}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setShowTips(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.tipsModal}>
+            <View style={styles.tipsHeader}>
+              <Text style={styles.tipsTitle}>{t('tips.title')}</Text>
+              <TouchableOpacity
+                onPress={() => setShowTips(false)}
+                style={styles.closeButton}
+              >
+                <Text style={styles.closeButtonText}>✕</Text>
+              </TouchableOpacity>
+            </View>
+            
+            <ScrollView style={styles.tipsContent} showsVerticalScrollIndicator={false}>
+              <View style={styles.tipSection}>
+                <Text style={styles.tipSectionTitle}>{t('tips.whatIsEph')}</Text>
+                <Text style={styles.tipSectionContent}>{t('tips.whatIsEphContent')}</Text>
+              </View>
+
+              <View style={styles.tipSection}>
+                <Text style={styles.tipSectionTitle}>{t('tips.howToUse')}</Text>
+                <Text style={styles.tipSectionContent}>{t('tips.howToUseContent')}</Text>
+              </View>
+
+              <View style={styles.tipSection}>
+                <Text style={styles.tipSectionTitle}>{t('tips.trainingTips')}</Text>
+                <Text style={styles.tipSectionContent}>{t('tips.trainingTip1')}</Text>
+                <Text style={styles.tipSectionContent}>{t('tips.trainingTip2')}</Text>
+                <Text style={styles.tipSectionContent}>{t('tips.trainingTip3')}</Text>
+                <Text style={styles.tipSectionContent}>{t('tips.trainingTip4')}</Text>
+              </View>
+
+              <View style={styles.tipSection}>
+                <Text style={styles.tipSectionTitle}>{t('tips.paceCalculator')}</Text>
+                <Text style={styles.tipSectionContent}>{t('tips.paceCalculatorContent')}</Text>
+              </View>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Running Tips Modal */}
+      <Modal
+        visible={showRunningTips}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setShowRunningTips(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.tipsModal}>
+            <View style={styles.tipsHeader}>
+              <Text style={styles.tipsTitle}>{t('common.runningTips')}</Text>
+              <TouchableOpacity
+                onPress={() => setShowRunningTips(false)}
+                style={styles.closeButton}
+              >
+                <Text style={styles.closeButtonText}>✕</Text>
+              </TouchableOpacity>
+            </View>
+            
+            <ScrollView style={styles.tipsContent} showsVerticalScrollIndicator={false}>
+              {articlesLoading && (
+                <View style={styles.loadingContainer}>
+                  <ActivityIndicator size="large" color={isDark ? '#3b82f6' : '#2563eb'} />
+                  <Text style={styles.loadingText}>{t('common.loadingArticles')}</Text>
+                </View>
+              )}
+
+              {articlesError && !articlesLoading && (
+                <View style={styles.errorContainer}>
+                  <Text style={styles.errorText}>{articlesError}</Text>
+                  <TouchableOpacity
+                    style={styles.retryButton}
+                    onPress={fetchRunningArticles}
+                  >
+                    <Text style={styles.retryButtonText}>{t('common.ok')}</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+
+              {!articlesLoading && !articlesError && articles.length === 0 && (
+                <Text style={styles.noArticlesText}>{t('common.noArticles')}</Text>
+              )}
+
+              {!articlesLoading && !articlesError && articles.length > 0 && articles.map((article, index) => (
+                <View key={index} style={styles.articleCard}>
+                  <Text style={styles.articleTitle}>{article.title}</Text>
+                  <Text style={styles.articleContent}>{article.content}</Text>
+                  {article.created_at && (
+                    <Text style={styles.articleDate}>
+                      {new Date(article.created_at).toLocaleDateString()}
+                    </Text>
+                  )}
+                </View>
+              ))}
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -336,7 +515,7 @@ function createStyles(isDark: boolean) {
     },
     header: {
       flexDirection: 'row',
-      justifyContent: 'flex-end',
+      justifyContent: 'space-between',
       alignItems: 'center',
       padding: 16,
       paddingBottom: 12,
@@ -483,6 +662,173 @@ function createStyles(isDark: boolean) {
     },
     navButtonTextActive: {
       color: '#ffffff',
+    },
+    menuButton: {
+      paddingVertical: 8,
+      paddingHorizontal: 12,
+      borderRadius: 6,
+      borderWidth: 1,
+      borderColor: isDark ? '#334155' : '#e2e8f0',
+      backgroundColor: isDark ? '#1e293b' : '#ffffff',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    menuButtonText: {
+      fontSize: 20,
+      fontWeight: '700',
+      color: isDark ? '#94a3b8' : '#64748b',
+      lineHeight: 20,
+    },
+    menuOverlay: {
+      flex: 1,
+      backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    },
+    modalOverlay: {
+      flex: 1,
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    menuModal: {
+      position: 'absolute',
+      top: 60,
+      left: 16,
+      backgroundColor: isDark ? '#1e293b' : '#ffffff',
+      borderRadius: 12,
+      minWidth: 180,
+      borderWidth: 1,
+      borderColor: isDark ? '#334155' : '#e2e8f0',
+      overflow: 'hidden',
+      shadowColor: '#000',
+      shadowOffset: {
+        width: 0,
+        height: 4,
+      },
+      shadowOpacity: 0.3,
+      shadowRadius: 8,
+      elevation: 8,
+    },
+    menuItem: {
+      padding: 16,
+      borderBottomWidth: 1,
+      borderBottomColor: isDark ? '#334155' : '#e2e8f0',
+    },
+    menuItemLast: {
+      borderBottomWidth: 0,
+    },
+    menuItemText: {
+      fontSize: 16,
+      fontWeight: '500',
+      color: isDark ? '#ffffff' : '#1e293b',
+      textAlign: 'left',
+    },
+    tipsModal: {
+      backgroundColor: isDark ? '#1e293b' : '#ffffff',
+      borderRadius: 16,
+      width: '90%',
+      maxHeight: '80%',
+      borderWidth: 1,
+      borderColor: isDark ? '#334155' : '#e2e8f0',
+      overflow: 'hidden',
+    },
+    tipsHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      padding: 20,
+      borderBottomWidth: 1,
+      borderBottomColor: isDark ? '#334155' : '#e2e8f0',
+    },
+    tipsTitle: {
+      fontSize: 24,
+      fontWeight: '700',
+      color: isDark ? '#ffffff' : '#1e293b',
+    },
+    closeButton: {
+      padding: 4,
+    },
+    closeButtonText: {
+      fontSize: 24,
+      fontWeight: '600',
+      color: isDark ? '#94a3b8' : '#64748b',
+    },
+    tipsContent: {
+      padding: 20,
+    },
+    tipSection: {
+      marginBottom: 20,
+    },
+    tipSectionTitle: {
+      fontSize: 18,
+      fontWeight: '600',
+      color: isDark ? '#3b82f6' : '#2563eb',
+      marginBottom: 8,
+    },
+    tipSectionContent: {
+      fontSize: 15,
+      color: isDark ? '#cbd5e1' : '#475569',
+      lineHeight: 22,
+      marginBottom: 4,
+    },
+    loadingContainer: {
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: 40,
+    },
+    loadingText: {
+      marginTop: 12,
+      fontSize: 16,
+      color: isDark ? '#94a3b8' : '#64748b',
+    },
+    errorContainer: {
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: 20,
+    },
+    retryButton: {
+      marginTop: 16,
+      backgroundColor: isDark ? '#3b82f6' : '#2563eb',
+      paddingVertical: 10,
+      paddingHorizontal: 24,
+      borderRadius: 8,
+    },
+    retryButtonText: {
+      color: '#ffffff',
+      fontSize: 16,
+      fontWeight: '600',
+    },
+    noArticlesText: {
+      fontSize: 16,
+      color: isDark ? '#94a3b8' : '#64748b',
+      textAlign: 'center',
+      padding: 40,
+    },
+    articleCard: {
+      backgroundColor: isDark ? '#0f172a' : '#f8fafc',
+      borderRadius: 12,
+      padding: 16,
+      marginBottom: 16,
+      borderWidth: 1,
+      borderColor: isDark ? '#334155' : '#e2e8f0',
+    },
+    articleTitle: {
+      fontSize: 18,
+      fontWeight: '600',
+      color: isDark ? '#ffffff' : '#1e293b',
+      marginBottom: 12,
+      lineHeight: 24,
+    },
+    articleContent: {
+      fontSize: 15,
+      color: isDark ? '#cbd5e1' : '#475569',
+      lineHeight: 22,
+      marginBottom: 8,
+    },
+    articleDate: {
+      fontSize: 13,
+      color: isDark ? '#64748b' : '#94a3b8',
+      fontStyle: 'italic',
+      marginTop: 8,
     },
   });
 }

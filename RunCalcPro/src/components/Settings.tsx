@@ -38,6 +38,7 @@ export default function Settings({ language, onLanguageChange }: SettingsProps) 
   const [currentLanguage, setCurrentLanguage] = useState<Language>(language);
   const [isCheckingUpdate, setIsCheckingUpdate] = useState(false);
   const [updateAvailable, setUpdateAvailable] = useState(false);
+  const [whatsNewExpanded, setWhatsNewExpanded] = useState(false);
 
   useEffect(() => {
     setCurrentLanguage(language);
@@ -271,6 +272,49 @@ export default function Settings({ language, onLanguageChange }: SettingsProps) 
                 </View>
               </View>
 
+              {/* What's New */}
+              <View style={styles.menuSection}>
+                <Text style={styles.menuSectionTitle}>
+                  {t('common.whatsNew')}
+                </Text>
+                <TouchableOpacity
+                  style={styles.menuItem}
+                  onPress={() => setWhatsNewExpanded(!whatsNewExpanded)}
+                >
+                  <View style={styles.menuItemContent}>
+                    <Ionicons
+                      name="sparkles-outline"
+                      size={20}
+                      color={isDark ? '#ffffff' : '#1e293b'}
+                    />
+                    <Text style={styles.menuItemText}>
+                      {t('common.whatsNewTitle', { version: appVersion })}
+                    </Text>
+                  </View>
+                  <Ionicons
+                    name={whatsNewExpanded ? 'chevron-up' : 'chevron-down'}
+                    size={20}
+                    color={isDark ? '#94a3b8' : '#64748b'}
+                  />
+                </TouchableOpacity>
+                {whatsNewExpanded && (
+                  <View style={styles.whatsNewContainer}>
+                    <Text style={styles.whatsNewFeature}>
+                      {t('common.whatsNewFeature1')}
+                    </Text>
+                    <Text style={styles.whatsNewFeature}>
+                      {t('common.whatsNewFeature2')}
+                    </Text>
+                    <Text style={styles.whatsNewFeature}>
+                      {t('common.whatsNewFeature3')}
+                    </Text>
+                    <Text style={styles.whatsNewFeature}>
+                      {t('common.whatsNewFeature4')}
+                    </Text>
+                  </View>
+                )}
+              </View>
+
               {/* Check for Updates */}
               <View style={styles.menuSection}>
                 <Text style={styles.menuSectionTitle}>
@@ -419,6 +463,20 @@ function createStyles(isDark: boolean) {
       fontSize: 16,
       fontWeight: '600',
       color: isDark ? '#94a3b8' : '#64748b',
+    },
+    whatsNewContainer: {
+      backgroundColor: isDark ? '#0f172a' : '#f8fafc',
+      borderRadius: 8,
+      padding: 16,
+      marginTop: 8,
+      marginLeft: 4,
+      marginRight: 4,
+    },
+    whatsNewFeature: {
+      fontSize: 13,
+      color: isDark ? '#cbd5e1' : '#475569',
+      marginBottom: 8,
+      lineHeight: 20,
     },
   });
 }
