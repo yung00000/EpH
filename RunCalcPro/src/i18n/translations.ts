@@ -120,6 +120,9 @@ export const translations = {
       loadingArticles: 'Loading articles...',
       noArticles: 'No articles available',
       fetchError: 'Failed to load articles. Please try again.',
+      filterByDate: 'Filter by Date',
+      allDates: 'All Dates',
+      today: 'Today',
     },
     tips: {
       title: 'Introduction',
@@ -252,6 +255,9 @@ export const translations = {
       loadingArticles: '正在載入文章...',
       noArticles: '暫無文章',
       fetchError: '載入文章失敗，請重試。',
+      filterByDate: '按日期篩選',
+      allDates: '全部日期',
+      today: '今天',
     },
     tips: {
       title: '介紹',

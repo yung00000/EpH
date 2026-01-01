@@ -55,6 +55,8 @@ export default function EpHCalculatorScreen() {
   const [articles, setArticles] = useState<any[]>([]);
   const [articlesLoading, setArticlesLoading] = useState(false);
   const [articlesError, setArticlesError] = useState('');
+  const [selectedDateFilter, setSelectedDateFilter] = useState<string>('today');
+  const [showDatePicker, setShowDatePicker] = useState(false);
 
   const styles = createStyles(isDark);
 
@@ -170,6 +172,91 @@ export default function EpHCalculatorScreen() {
     await loadHistory();
   };
 
+  const parseDateString = (dateString: string): Date | null => {
+    if (!dateString) {
+      return null;
+    }
+    try {
+      let isoString = dateString.trim();
+      isoString = isoString.replace(' ', 'T');
+      if (isoString.match(/[+-]\d{2}$/)) {
+        isoString = isoString.replace(/([+-])(\d{2})$/, '$1$2:00');
+      }
+      const date = new Date(isoString);
+      return isNaN(date.getTime()) ? null : date;
+    } catch (error) {
+      return null;
+    }
+  };
+
+  const formatDate = (dateString: string): string => {
+    const date = parseDateString(dateString);
+    if (!date) {
+      return '';
+    }
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}-${month}-${year}`;
+  };
+
+  const getDateKey = (dateString: string): string => {
+    const date = parseDateString(dateString);
+    if (!date) {
+      return '';
+    }
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${year}-${month}-${day}`;
+  };
+
+  const getTodayDateKey = (): string => {
+    const today = new Date();
+    const day = String(today.getDate()).padStart(2, '0');
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const year = today.getFullYear();
+    return `${year}-${month}-${day}`;
+  };
+
+  const getFilteredArticles = (): any[] => {
+    if (selectedDateFilter === 'all') {
+      return articles;
+    }
+    if (selectedDateFilter === 'today') {
+      const todayKey = getTodayDateKey();
+      return articles.filter((article) => {
+        if (!article.created_at) return false;
+        return getDateKey(article.created_at) === todayKey;
+      });
+    }
+    // Filter by specific date
+    return articles.filter((article) => {
+      if (!article.created_at) return false;
+      return getDateKey(article.created_at) === selectedDateFilter;
+    });
+  };
+
+  const getAvailableDates = (): Array<{ dateKey: string; title: string }> => {
+    const dateMap = new Map<string, string>();
+    const todayKey = getTodayDateKey();
+    articles.forEach((article) => {
+      if (article.created_at) {
+        const dateKey = getDateKey(article.created_at);
+        if (dateKey && dateKey !== todayKey) {
+          if (!dateMap.has(dateKey) && article.title) {
+            // Get title until colon if it exists
+            const titlePart = article.title.split('：')[0] || article.title.split(':')[0] || article.title;
+            dateMap.set(dateKey, titlePart.trim());
+          }
+        }
+      }
+    });
+    return Array.from(dateMap.entries())
+      .map(([dateKey, title]) => ({ dateKey, title }))
+      .sort((a, b) => b.dateKey.localeCompare(a.dateKey)); // Most recent first
+  };
+
   const fetchRunningArticles = async () => {
     setArticlesLoading(true);
     setArticlesError('');
@@ -199,6 +286,11 @@ export default function EpHCalculatorScreen() {
       
       const data = await response.json();
       console.log('Articles fetched:', data.articles?.length || 0);
+      console.log('First article sample:', data.articles?.[0]);
+      if (data.articles && data.articles.length > 0) {
+        console.log('Article keys:', Object.keys(data.articles[0]));
+        console.log('created_at value:', data.articles[0].created_at);
+      }
       setArticles(data.articles || []);
     } catch (err: any) {
       console.error('Fetch error:', err);
@@ -403,6 +495,7 @@ export default function EpHCalculatorScreen() {
               style={[styles.menuItem, styles.menuItemLast]}
               onPress={async () => {
                 setShowMenu(false);
+                setSelectedDateFilter('today');
                 setShowRunningTips(true);
                 await fetchRunningArticles();
               }}
@@ -478,6 +571,93 @@ export default function EpHCalculatorScreen() {
                 <Text style={styles.closeButtonText}>✕</Text>
               </TouchableOpacity>
             </View>
+
+            {/* Date Filter */}
+            <View style={styles.dateFilterContainer}>
+              <Text style={styles.dateFilterLabel}>{t('common.filterByDate')}:</Text>
+              <TouchableOpacity
+                style={styles.dateFilterButton}
+                onPress={() => setShowDatePicker(!showDatePicker)}
+              >
+                <Text style={styles.dateFilterButtonText}>
+                  {selectedDateFilter === 'all' 
+                    ? t('common.allDates')
+                    : selectedDateFilter === 'today'
+                    ? t('common.today')
+                    : (() => {
+                        const [year, month, day] = selectedDateFilter.split('-');
+                        return `${day}-${month}-${year}`;
+                      })()}
+                </Text>
+                <Text style={styles.dateFilterArrow}>{showDatePicker ? '▲' : '▼'}</Text>
+              </TouchableOpacity>
+              {showDatePicker && (
+                <View style={styles.dateFilterDropdown}>
+                  <ScrollView style={styles.dateFilterScroll} nestedScrollEnabled>
+                    <TouchableOpacity
+                      style={styles.dateFilterOption}
+                      onPress={() => {
+                        setSelectedDateFilter('all');
+                        setShowDatePicker(false);
+                      }}
+                    >
+                      <Text style={[
+                        styles.dateFilterOptionText,
+                        selectedDateFilter === 'all' && styles.dateFilterOptionTextActive
+                      ]}>
+                        {t('common.allDates')}
+                      </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.dateFilterOption}
+                      onPress={() => {
+                        setSelectedDateFilter('today');
+                        setShowDatePicker(false);
+                      }}
+                    >
+                      <Text style={[
+                        styles.dateFilterOptionText,
+                        selectedDateFilter === 'today' && styles.dateFilterOptionTextActive
+                      ]}>
+                        {t('common.today')}
+                      </Text>
+                    </TouchableOpacity>
+                    {getAvailableDates().map(({ dateKey, title }) => {
+                      return (
+                        <TouchableOpacity
+                          key={dateKey}
+                          style={styles.dateFilterOption}
+                          onPress={() => {
+                            setSelectedDateFilter(dateKey);
+                            setShowDatePicker(false);
+                          }}
+                        >
+                          <View style={styles.dateFilterOptionContent}>
+                            <Text style={[
+                              styles.dateFilterOptionText,
+                              selectedDateFilter === dateKey && styles.dateFilterOptionTextActive
+                            ]}>
+                              {(() => {
+                                const [year, month, day] = dateKey.split('-');
+                                return `${day}-${month}-${year}`;
+                              })()}
+                            </Text>
+                            {title && (
+                              <Text style={[
+                                styles.dateFilterOptionTitle,
+                                selectedDateFilter === dateKey && styles.dateFilterOptionTitleActive
+                              ]} numberOfLines={1}>
+                                {' - '}{title}
+                              </Text>
+                            )}
+                          </View>
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </ScrollView>
+                </View>
+              )}
+            </View>
             
             <ScrollView style={styles.tipsContent} showsVerticalScrollIndicator={false}>
               {articlesLoading && (
@@ -503,17 +683,24 @@ export default function EpHCalculatorScreen() {
                 <Text style={styles.noArticlesText}>{t('common.noArticles')}</Text>
               )}
 
-              {!articlesLoading && !articlesError && articles.length > 0 && articles.map((article, index) => (
-                <View key={index} style={styles.articleCard}>
-                  <Text style={styles.articleTitle}>{article.title}</Text>
-                  <Text style={styles.articleContent}>{article.content}</Text>
-                  {article.created_at && (
-                    <Text style={styles.articleDate}>
-                      {new Date(article.created_at).toLocaleDateString()}
-                    </Text>
-                  )}
-                </View>
-              ))}
+              {!articlesLoading && !articlesError && getFilteredArticles().length === 0 && articles.length > 0 && (
+                <Text style={styles.noArticlesText}>{t('common.noArticles')}</Text>
+              )}
+
+              {!articlesLoading && !articlesError && getFilteredArticles().length > 0 && getFilteredArticles().map((article, index) => {
+                const formattedDate = article.created_at && article.created_at !== null 
+                  ? formatDate(article.created_at) 
+                  : '';
+                return (
+                  <View key={index} style={styles.articleCard}>
+                    {formattedDate ? (
+                      <Text style={styles.articleDate}>{formattedDate}</Text>
+                    ) : null}
+                    <Text style={styles.articleTitle}>{article.title}</Text>
+                    <Text style={styles.articleContent}>{article.content}</Text>
+                  </View>
+                );
+              })}
             </ScrollView>
           </View>
         </View>
@@ -843,7 +1030,88 @@ function createStyles(isDark: boolean) {
       fontSize: 13,
       color: isDark ? '#64748b' : '#94a3b8',
       fontStyle: 'italic',
-      marginTop: 8,
+      marginBottom: 8,
+    },
+    dateFilterContainer: {
+      padding: 16,
+      borderBottomWidth: 1,
+      borderBottomColor: isDark ? '#334155' : '#e2e8f0',
+      backgroundColor: isDark ? '#0f172a' : '#f8fafc',
+      position: 'relative',
+    },
+    dateFilterLabel: {
+      fontSize: 14,
+      fontWeight: '500',
+      color: isDark ? '#ffffff' : '#1e293b',
+      marginBottom: 8,
+    },
+    dateFilterButton: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      backgroundColor: isDark ? '#1e293b' : '#ffffff',
+      borderWidth: 1,
+      borderColor: isDark ? '#334155' : '#e2e8f0',
+      borderRadius: 8,
+      padding: 12,
+    },
+    dateFilterButtonText: {
+      fontSize: 15,
+      fontWeight: '500',
+      color: isDark ? '#ffffff' : '#1e293b',
+    },
+    dateFilterArrow: {
+      fontSize: 12,
+      color: isDark ? '#94a3b8' : '#64748b',
+    },
+    dateFilterDropdown: {
+      position: 'absolute',
+      top: 70,
+      left: 16,
+      right: 16,
+      backgroundColor: isDark ? '#1e293b' : '#ffffff',
+      borderWidth: 1,
+      borderColor: isDark ? '#334155' : '#e2e8f0',
+      borderRadius: 8,
+      maxHeight: 200,
+      zIndex: 1000,
+      shadowColor: '#000',
+      shadowOffset: {
+        width: 0,
+        height: 4,
+      },
+      shadowOpacity: 0.3,
+      shadowRadius: 8,
+      elevation: 8,
+    },
+    dateFilterScroll: {
+      maxHeight: 200,
+    },
+    dateFilterOption: {
+      padding: 12,
+      borderBottomWidth: 1,
+      borderBottomColor: isDark ? '#334155' : '#e2e8f0',
+    },
+    dateFilterOptionContent: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      alignItems: 'center',
+    },
+    dateFilterOptionText: {
+      fontSize: 15,
+      color: isDark ? '#cbd5e1' : '#475569',
+    },
+    dateFilterOptionTextActive: {
+      color: isDark ? '#3b82f6' : '#2563eb',
+      fontWeight: '600',
+    },
+    dateFilterOptionTitle: {
+      fontSize: 14,
+      color: isDark ? '#94a3b8' : '#64748b',
+      flexShrink: 1,
+    },
+    dateFilterOptionTitleActive: {
+      color: isDark ? '#3b82f6' : '#2563eb',
     },
   });
 }
