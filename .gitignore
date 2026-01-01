@@ -143,6 +143,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+RunCalcPro/.env
 
 # Spyder project settings
 .spyderproject
