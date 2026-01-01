@@ -27,6 +27,12 @@ import {
   deleteEphHistoryItem,
   EpHHistoryItem,
   TrackHistoryItem,
+  loadArticlesCache,
+  saveArticlesCache,
+  getLastFetchTimestamp,
+  getLastArticleId,
+  mergeArticles,
+  Article,
 } from '../utils/storage';
 import { Language } from '../types';
 import Settings from '../components/Settings';
@@ -63,6 +69,14 @@ export default function EpHCalculatorScreen() {
   useEffect(() => {
     loadSavedLanguage();
     loadHistory();
+    // Load cached articles immediately when component mounts
+    const loadCachedArticles = async () => {
+      const cached = await loadArticlesCache();
+      if (cached.length > 0) {
+        setArticles(cached);
+      }
+    };
+    loadCachedArticles();
   }, []);
 
   const loadSavedLanguage = async () => {
@@ -260,13 +274,36 @@ export default function EpHCalculatorScreen() {
   const fetchRunningArticles = async () => {
     setArticlesLoading(true);
     setArticlesError('');
+    
     try {
+      // Load cached articles first (for offline support)
+      const cachedArticles = await loadArticlesCache();
+      if (cachedArticles.length > 0) {
+        setArticles(cachedArticles);
+        setArticlesLoading(false);
+      }
+      
+      // Check if we need to fetch new articles
+      const lastFetch = await getLastFetchTimestamp();
+      const now = Date.now();
+      const CACHE_DURATION = 60 * 60 * 1000; // 1 hour cache
+      
+      // Only fetch if:
+      // 1. No cache exists, OR
+      // 2. Cache is older than 1 hour
+      const shouldFetch = !lastFetch || (now - lastFetch) > CACHE_DURATION;
+      
+      if (!shouldFetch && cachedArticles.length > 0) {
+        // Use cached articles, no need to fetch
+        console.log('Using cached articles');
+        return;
+      }
+      
+      // Fetch new articles from API
       const apiBaseUrl = process.env.EXPO_PUBLIC_API_BASE_URL || 'https://api-articles.runcals.com';
       const apiKey = process.env.EXPO_PUBLIC_API_KEY || 'L0IUJK-_bBaKm1DOSI-3kxAfv9pbTuvsnsllQsnluFU';
       
-      console.log('API Base URL:', apiBaseUrl);
-      console.log('API Key exists:', !!apiKey);
-      console.log('API Key length:', apiKey?.length);
+      console.log('Fetching new articles from API...');
       
       const response = await fetch(`${apiBaseUrl}/all-articles`, {
         method: 'GET',
@@ -276,26 +313,38 @@ export default function EpHCalculatorScreen() {
         },
       });
       
-      console.log('Response status:', response.status);
-      
       if (!response.ok) {
-        const errorText = await response.text();
-        console.log('Error response:', errorText);
         throw new Error(`Failed to fetch articles: ${response.status}`);
       }
       
       const data = await response.json();
-      console.log('Articles fetched:', data.articles?.length || 0);
-      console.log('First article sample:', data.articles?.[0]);
-      if (data.articles && data.articles.length > 0) {
-        console.log('Article keys:', Object.keys(data.articles[0]));
-        console.log('created_at value:', data.articles[0].created_at);
-      }
-      setArticles(data.articles || []);
+      const newArticles = data.articles || [];
+      
+      // Merge new articles with cached articles
+      const mergedArticles = mergeArticles(cachedArticles, newArticles);
+      
+      // Save to cache
+      await saveArticlesCache(mergedArticles);
+      
+      // Update state
+      setArticles(mergedArticles);
+      
+      console.log(`Loaded ${mergedArticles.length} articles (${newArticles.length} new)`);
+      
     } catch (err: any) {
       console.error('Fetch error:', err);
-      setArticlesError(err.message || t('common.fetchError'));
-      setArticles([]);
+      
+      // If we have cached articles, use them even if fetch failed
+      const cachedArticles = await loadArticlesCache();
+      if (cachedArticles.length > 0) {
+        console.log('Using cached articles due to fetch error');
+        setArticles(cachedArticles);
+        setArticlesError(''); // Don't show error if we have cached data
+      } else {
+        // Only show error if we have no cached data
+        setArticlesError(err.message || t('common.fetchError'));
+        setArticles([]);
+      }
     } finally {
       setArticlesLoading(false);
     }

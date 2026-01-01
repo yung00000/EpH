@@ -11,6 +11,8 @@ const STORAGE_KEYS = {
   TRACK_HISTORY: 'trackCalculatorHistory',
   LANGUAGE: 'language',
   THEME: 'theme',
+  ARTICLES: 'runningArticles',
+  ARTICLES_LAST_FETCH: 'articlesLastFetch',
 } as const;
 
 // EpH Calculator History
@@ -209,5 +211,115 @@ export async function loadTheme(): Promise<'light' | 'dark' | 'automatic' | null
     console.error('Error loading theme:', error);
     return null;
   }
+}
+
+// Article interface
+export interface Article {
+  title: string;
+  content: string;
+  created_at: string | null;
+}
+
+export interface ArticlesCache {
+  articles: Article[];
+  lastFetchTimestamp: number;
+  lastArticleId?: string; // Use created_at as unique identifier
+}
+
+/**
+ * Save articles to cache
+ */
+export async function saveArticlesCache(articles: Article[]): Promise<void> {
+  try {
+    const cache: ArticlesCache = {
+      articles,
+      lastFetchTimestamp: Date.now(),
+      lastArticleId: articles.length > 0 ? articles[0].created_at || undefined : undefined,
+    };
+    await AsyncStorage.setItem(STORAGE_KEYS.ARTICLES, JSON.stringify(cache));
+  } catch (error) {
+    console.error('Error saving articles cache:', error);
+    throw error;
+  }
+}
+
+/**
+ * Load articles from cache
+ */
+export async function loadArticlesCache(): Promise<Article[]> {
+  try {
+    const cacheData = await AsyncStorage.getItem(STORAGE_KEYS.ARTICLES);
+    if (cacheData) {
+      const cache: ArticlesCache = JSON.parse(cacheData);
+      return cache.articles || [];
+    }
+    return [];
+  } catch (error) {
+    console.error('Error loading articles cache:', error);
+    return [];
+  }
+}
+
+/**
+ * Get last fetch timestamp
+ */
+export async function getLastFetchTimestamp(): Promise<number | null> {
+  try {
+    const cacheData = await AsyncStorage.getItem(STORAGE_KEYS.ARTICLES);
+    if (cacheData) {
+      const cache: ArticlesCache = JSON.parse(cacheData);
+      return cache.lastFetchTimestamp || null;
+    }
+    return null;
+  } catch (error) {
+    console.error('Error getting last fetch timestamp:', error);
+    return null;
+  }
+}
+
+/**
+ * Get last article ID (most recent article's created_at)
+ */
+export async function getLastArticleId(): Promise<string | null> {
+  try {
+    const cacheData = await AsyncStorage.getItem(STORAGE_KEYS.ARTICLES);
+    if (cacheData) {
+      const cache: ArticlesCache = JSON.parse(cacheData);
+      return cache.lastArticleId || null;
+    }
+    return null;
+  } catch (error) {
+    console.error('Error getting last article ID:', error);
+    return null;
+  }
+}
+
+/**
+ * Merge new articles with cached articles (remove duplicates)
+ */
+export function mergeArticles(cachedArticles: Article[], newArticles: Article[]): Article[] {
+  const articleMap = new Map<string, Article>();
+  
+  // Add cached articles first
+  cachedArticles.forEach((article) => {
+    const key = article.created_at || article.title;
+    if (key) {
+      articleMap.set(key, article);
+    }
+  });
+  
+  // Add new articles (will overwrite duplicates)
+  newArticles.forEach((article) => {
+    const key = article.created_at || article.title;
+    if (key) {
+      articleMap.set(key, article);
+    }
+  });
+  
+  // Convert back to array and sort by created_at (newest first)
+  return Array.from(articleMap.values()).sort((a, b) => {
+    if (!a.created_at || !b.created_at) return 0;
+    return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+  });
 }
 
