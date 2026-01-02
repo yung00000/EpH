@@ -13,6 +13,7 @@ import {
   StyleSheet,
   ActivityIndicator,
   Modal,
+  RefreshControl,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
@@ -60,6 +61,7 @@ export default function TrackCalculatorScreen() {
   const [articlesError, setArticlesError] = useState('');
   const [selectedDateFilter, setSelectedDateFilter] = useState<string>('today');
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   const styles = createStyles(isDark);
 
@@ -313,17 +315,19 @@ export default function TrackCalculatorScreen() {
     if (!date) {
       return '';
     }
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const year = date.getFullYear();
+    // Use UTC date to avoid timezone issues
+    const day = String(date.getUTCDate()).padStart(2, '0');
+    const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+    const year = date.getUTCFullYear();
     return `${year}-${month}-${day}`;
   };
 
   const getTodayDateKey = (): string => {
     const today = new Date();
-    const day = String(today.getDate()).padStart(2, '0');
-    const month = String(today.getMonth() + 1).padStart(2, '0');
-    const year = today.getFullYear();
+    // Use UTC date to match API dates (which are in UTC)
+    const day = String(today.getUTCDate()).padStart(2, '0');
+    const month = String(today.getUTCMonth() + 1).padStart(2, '0');
+    const year = today.getUTCFullYear();
     return `${year}-${month}-${day}`;
   };
 
@@ -365,14 +369,14 @@ export default function TrackCalculatorScreen() {
       .sort((a, b) => b.dateKey.localeCompare(a.dateKey)); // Most recent first
   };
 
-  const fetchRunningArticles = async () => {
+  const fetchRunningArticles = async (forceRefresh: boolean = false) => {
     setArticlesLoading(true);
     setArticlesError('');
     
     try {
       // Load cached articles first (for offline support)
       const cachedArticles = await loadArticlesCache();
-      if (cachedArticles.length > 0) {
+      if (cachedArticles.length > 0 && !forceRefresh) {
         setArticles(cachedArticles);
         setArticlesLoading(false);
       }
@@ -383,9 +387,10 @@ export default function TrackCalculatorScreen() {
       const CACHE_DURATION = 60 * 60 * 1000; // 1 hour cache
       
       // Only fetch if:
-      // 1. No cache exists, OR
-      // 2. Cache is older than 1 hour
-      const shouldFetch = !lastFetch || (now - lastFetch) > CACHE_DURATION;
+      // 1. Force refresh requested, OR
+      // 2. No cache exists, OR
+      // 3. Cache is older than 1 hour
+      const shouldFetch = forceRefresh || !lastFetch || (now - lastFetch) > CACHE_DURATION;
       
       if (!shouldFetch && cachedArticles.length > 0) {
         // Use cached articles, no need to fetch
@@ -397,7 +402,7 @@ export default function TrackCalculatorScreen() {
       const apiBaseUrl = process.env.EXPO_PUBLIC_API_BASE_URL || 'https://api-articles.runcals.com';
       const apiKey = process.env.EXPO_PUBLIC_API_KEY || 'L0IUJK-_bBaKm1DOSI-3kxAfv9pbTuvsnsllQsnluFU';
       
-      console.log('Fetching new articles from API...');
+      console.log('Fetching new articles from API...', forceRefresh ? '(forced refresh)' : '');
       
       const response = await fetch(`${apiBaseUrl}/all-articles`, {
         method: 'GET',
@@ -424,6 +429,11 @@ export default function TrackCalculatorScreen() {
       setArticles(mergedArticles);
       
       console.log(`Loaded ${mergedArticles.length} articles (${newArticles.length} new)`);
+      console.log('Today date key:', getTodayDateKey());
+      console.log('Today articles count:', mergedArticles.filter((article) => {
+        if (!article.created_at) return false;
+        return getDateKey(article.created_at) === getTodayDateKey();
+      }).length);
       
     } catch (err: any) {
       console.error('Fetch error:', err);
@@ -441,7 +451,13 @@ export default function TrackCalculatorScreen() {
       }
     } finally {
       setArticlesLoading(false);
+      setRefreshing(false);
     }
+  };
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchRunningArticles(true); // Force refresh
   };
 
   return (
@@ -842,7 +858,18 @@ export default function TrackCalculatorScreen() {
               )}
             </View>
             
-            <ScrollView style={styles.tipsContent} showsVerticalScrollIndicator={false}>
+            <ScrollView 
+              style={styles.tipsContent} 
+              showsVerticalScrollIndicator={false}
+              refreshControl={
+                <RefreshControl
+                  refreshing={refreshing}
+                  onRefresh={onRefresh}
+                  tintColor={isDark ? '#3b82f6' : '#2563eb'}
+                  colors={[isDark ? '#3b82f6' : '#2563eb']}
+                />
+              }
+            >
               {articlesLoading && (
                 <View style={styles.loadingContainer}>
                   <ActivityIndicator size="large" color={isDark ? '#3b82f6' : '#2563eb'} />
@@ -855,7 +882,7 @@ export default function TrackCalculatorScreen() {
                   <Text style={styles.errorText}>{articlesError}</Text>
                   <TouchableOpacity
                     style={styles.retryButton}
-                    onPress={fetchRunningArticles}
+                    onPress={() => fetchRunningArticles(true)}
                   >
                     <Text style={styles.retryButtonText}>{t('common.ok')}</Text>
                   </TouchableOpacity>
