@@ -144,6 +144,7 @@ ENV/
 env.bak/
 venv.bak/
 RunCalcPro/.env
+RunCalcPro/eas.json
 
 # Spyder project settings
 .spyderproject
