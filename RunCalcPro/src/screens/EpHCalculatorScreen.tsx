@@ -557,7 +557,7 @@ export default function EpHCalculatorScreen() {
               <Text style={styles.menuItemText}>{t('common.tips')}</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.menuItem, styles.menuItemLast]}
+              style={styles.menuItem}
               onPress={async () => {
                 setShowMenu(false);
                 setSelectedDateFilter('today');
@@ -566,6 +566,15 @@ export default function EpHCalculatorScreen() {
               }}
             >
               <Text style={styles.menuItemText}>{t('common.runningTips')}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.menuItem, styles.menuItemLast]}
+              onPress={() => {
+                setShowMenu(false);
+                navigation.navigate('Events' as never);
+              }}
+            >
+              <Text style={styles.menuItemText}>{t('common.upcomingEvents')}</Text>
             </TouchableOpacity>
           </View>
         </TouchableOpacity>
@@ -801,9 +810,10 @@ function createStyles(isDark: boolean) {
     navContainer: {
       flexDirection: 'row',
       alignItems: 'center',
+      marginLeft: 0,
     },
     settingsWrapper: {
-      marginLeft: 12,
+      marginLeft: 0,
     },
     scrollView: {
       flex: 1,
@@ -927,7 +937,7 @@ function createStyles(isDark: boolean) {
       backgroundColor: isDark ? '#1e293b' : '#ffffff',
     },
     navButtonSpacing: {
-      marginLeft: 8,
+      marginLeft: 0,
     },
     navButtonActive: {
       backgroundColor: isDark ? '#3b82f6' : '#2563eb',
@@ -1188,6 +1198,135 @@ function createStyles(isDark: boolean) {
     },
     dateFilterOptionTitleActive: {
       color: isDark ? '#3b82f6' : '#2563eb',
+    },
+    upcomingEventCard: {
+      backgroundColor: isDark ? '#1e293b' : '#ffffff',
+      borderRadius: 12,
+      padding: 16,
+      margin: 16,
+      marginBottom: 16,
+      borderWidth: 2,
+      borderColor: isDark ? '#3b82f6' : '#2563eb',
+    },
+    upcomingEventName: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: isDark ? '#ffffff' : '#1e293b',
+      marginBottom: 12,
+    },
+    upcomingEventRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: 8,
+    },
+    upcomingEventDays: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: isDark ? '#3b82f6' : '#2563eb',
+      flex: 1,
+    },
+    upcomingEventDate: {
+      fontSize: 16,
+      fontWeight: '500',
+      color: isDark ? '#94a3b8' : '#64748b',
+    },
+    upcomingEventType: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: isDark ? '#ffffff' : '#1e293b',
+    },
+    eventForm: {
+      padding: 16,
+      borderBottomWidth: 1,
+      borderBottomColor: isDark ? '#334155' : '#e2e8f0',
+      marginBottom: 16,
+    },
+    eventFormTitle: {
+      fontSize: 18,
+      fontWeight: '600',
+      color: isDark ? '#ffffff' : '#1e293b',
+      marginBottom: 16,
+    },
+    eventsList: {
+      padding: 16,
+    },
+    eventsListTitle: {
+      fontSize: 18,
+      fontWeight: '600',
+      color: isDark ? '#ffffff' : '#1e293b',
+      marginBottom: 16,
+    },
+    eventCard: {
+      flexDirection: 'row',
+      backgroundColor: isDark ? '#0f172a' : '#f8fafc',
+      borderRadius: 12,
+      padding: 16,
+      marginBottom: 12,
+      borderWidth: 1,
+      borderColor: isDark ? '#334155' : '#e2e8f0',
+      alignItems: 'center',
+    },
+    eventCardContent: {
+      flex: 1,
+    },
+    eventCardName: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: isDark ? '#ffffff' : '#1e293b',
+      marginBottom: 8,
+    },
+    eventCardDetail: {
+      fontSize: 14,
+      color: isDark ? '#94a3b8' : '#64748b',
+    },
+    deleteEventButton: {
+      width: 32,
+      height: 32,
+      borderRadius: 16,
+      backgroundColor: isDark ? '#334155' : '#e2e8f0',
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginLeft: 12,
+    },
+    deleteEventButtonText: {
+      fontSize: 18,
+      color: isDark ? '#f87171' : '#ef4444',
+      fontWeight: '600',
+    },
+    noEventsText: {
+      fontSize: 16,
+      color: isDark ? '#94a3b8' : '#64748b',
+      textAlign: 'center',
+      padding: 40,
+    },
+    typePickerDropdown: {
+      position: 'absolute',
+      top: 50,
+      left: 0,
+      right: 0,
+      backgroundColor: isDark ? '#1e293b' : '#ffffff',
+      borderWidth: 1,
+      borderColor: isDark ? '#334155' : '#e2e8f0',
+      borderRadius: 8,
+      zIndex: 1000,
+      shadowColor: '#000',
+      shadowOffset: {
+        width: 0,
+        height: 4,
+      },
+      shadowOpacity: 0.3,
+      shadowRadius: 8,
+      elevation: 8,
+    },
+    typePickerOption: {
+      padding: 12,
+      borderBottomWidth: 1,
+      borderBottomColor: isDark ? '#334155' : '#e2e8f0',
+    },
+    typePickerOptionText: {
+      fontSize: 15,
+      color: isDark ? '#ffffff' : '#1e293b',
     },
   });
 }

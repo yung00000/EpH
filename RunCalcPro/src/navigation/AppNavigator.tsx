@@ -7,11 +7,13 @@ import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import EpHCalculatorScreen from '../screens/EpHCalculatorScreen';
 import TrackCalculatorScreen from '../screens/TrackCalculatorScreen';
+import EventsScreen from '../screens/EventsScreen';
 import { useTranslation } from 'react-i18next';
 
 export type RootStackParamList = {
   EpHCalculator: undefined;
   TrackCalculator: undefined;
+  Events: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -45,6 +47,14 @@ export default function AppNavigator() {
         component={TrackCalculatorScreen}
         options={{
           title: t('common.trackCalculator'),
+          headerShown: false, // We have custom header in screens
+        }}
+      />
+      <Stack.Screen
+        name="Events"
+        component={EventsScreen}
+        options={{
+          title: t('common.eventsTitle'),
           headerShown: false, // We have custom header in screens
         }}
       />

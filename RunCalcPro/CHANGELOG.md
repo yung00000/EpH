@@ -1,6 +1,47 @@
 # Changelog
 
-## Version 1.2.0 (Current)
+## Version 1.2.1 (Current)
+
+### New Features
+
+#### Race Events Management
+- ✅ **Race Events Tracker**: New dedicated screen to manage your upcoming races
+  - Access via "More" menu → "Upcoming Events"
+  - Add race events with event name, date, type, and optional distance
+  - Calendar date picker for easy date selection
+  - Event type selector: 5KM, 10KM, Half Marathon, Marathon, Trail Run, Other
+  - Distance field (required for Trail Run and Other types)
+- ✅ **Upcoming Event Card**: Displays next upcoming race with countdown
+  - Shows days until the event
+  - Displays formatted event date (dd MMM yy)
+  - Shows event type
+  - Automatically updates based on current date
+- ✅ **Event Management**:
+  - **Swipe-to-delete**: Swipe left on any event to delete (consistent with history management)
+  - All events stored locally with AsyncStorage
+  - Events list sorted by date (nearest first)
+  - Visual countdown for upcoming events
+- ✅ **Running Tips & Articles**: Enhanced content section in "More" menu
+  - Fetch articles from API with date filtering
+  - Article caching for offline access
+  - Pull-to-refresh functionality
+  - Date filter dropdown (Today, specific dates)
+
+#### UI Improvements
+- ✅ **Navigation Updates**: Tighter button spacing in top navigation bar
+- ✅ **More Menu**: Redesigned popup with dropdown-style positioning (top-left corner)
+- ✅ **Modal Pickers**: Improved type picker with better scrolling and visibility
+
+### Technical Improvements
+- ✅ React Navigation stack implementation for Events screen
+- ✅ Date manipulation utilities (countdown, formatting, UTC handling)
+- ✅ Enhanced AsyncStorage management for events
+- ✅ Gesture handler integration for swipe-to-delete
+- ✅ Date picker integration (@react-native-community/datetimepicker)
+
+---
+
+## Version 1.2.0
 
 ### Major Updates
 

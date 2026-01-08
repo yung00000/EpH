@@ -13,6 +13,7 @@ const STORAGE_KEYS = {
   THEME: 'theme',
   ARTICLES: 'runningArticles',
   ARTICLES_LAST_FETCH: 'articlesLastFetch',
+  EVENTS: 'raceEvents',
 } as const;
 
 // EpH Calculator History
@@ -323,3 +324,73 @@ export function mergeArticles(cachedArticles: Article[], newArticles: Article[])
   });
 }
 
+// Race Event interface
+export interface RaceEvent {
+  id: string;
+  eventName: string;
+  date: string;
+  type: '5KM' | '10KM' | 'Half Marathon' | 'Marathon' | 'Trail Run' | 'Other';
+  distance?: string; // Optional, only required for Trail Run and Other
+  createdAt: string;
+}
+
+/**
+ * Save race event
+ */
+export async function saveRaceEvent(event: Omit<RaceEvent, 'id' | 'createdAt'>): Promise<void> {
+  try {
+    const events = await loadRaceEvents();
+    const newEvent: RaceEvent = {
+      ...event,
+      id: Date.now().toString(),
+      createdAt: new Date().toISOString(),
+    };
+    const newEvents = [newEvent, ...events];
+    await AsyncStorage.setItem(STORAGE_KEYS.EVENTS, JSON.stringify(newEvents));
+  } catch (error) {
+    console.error('Error saving race event:', error);
+    throw error;
+  }
+}
+
+/**
+ * Load race events
+ */
+export async function loadRaceEvents(): Promise<RaceEvent[]> {
+  try {
+    const eventsData = await AsyncStorage.getItem(STORAGE_KEYS.EVENTS);
+    if (eventsData) {
+      return JSON.parse(eventsData);
+    }
+    return [];
+  } catch (error) {
+    console.error('Error loading race events:', error);
+    return [];
+  }
+}
+
+/**
+ * Delete a race event by ID
+ */
+export async function deleteRaceEvent(eventId: string): Promise<void> {
+  try {
+    const events = await loadRaceEvents();
+    const newEvents = events.filter((event) => event.id !== eventId);
+    await AsyncStorage.setItem(STORAGE_KEYS.EVENTS, JSON.stringify(newEvents));
+  } catch (error) {
+    console.error('Error deleting race event:', error);
+    throw error;
+  }
+}
+
+/**
+ * Clear all race events
+ */
+export async function clearRaceEvents(): Promise<void> {
+  try {
+    await AsyncStorage.removeItem(STORAGE_KEYS.EVENTS);
+  } catch (error) {
+    console.error('Error clearing race events:', error);
+    throw error;
+  }
+}
