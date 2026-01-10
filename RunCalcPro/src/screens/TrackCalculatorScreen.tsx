@@ -502,8 +502,6 @@ export default function TrackCalculatorScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>{t('track.title')}</Text>
-
           {/* Mode Selector */}
           <View style={styles.modeContainer}>
             <TouchableOpacity

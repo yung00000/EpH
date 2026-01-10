@@ -192,6 +192,12 @@ docker run -p 8080:8080 eph-calculator
 - ✅ FlatList for optimized history rendering (up to 20 records)
 - ✅ Responsive design for all screen sizes
 
+### Version History
+
+📄 **[View complete update history](RunCalcPro/UPDATE_HISTORY.md)** - See all versions, new features, improvements, and bug fixes
+
+**Current Version**: 1.2.1 (January 10, 2026)
+
 ### Technology Stack
 
 - **Framework**: React Native with Expo SDK 54

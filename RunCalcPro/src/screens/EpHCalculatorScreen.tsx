@@ -407,8 +407,6 @@ export default function EpHCalculatorScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>{t('eph.title')}</Text>
-
           <View style={styles.formGroup}>
             <View style={styles.modeContainer}>
               <TouchableOpacity

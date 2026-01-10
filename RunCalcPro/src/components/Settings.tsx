@@ -64,6 +64,7 @@ export default function Settings({ language, onLanguageChange }: SettingsProps) 
   };
 
   const getThemeText = () => {
+    // Always show what mode is currently selected in settings
     if (theme === 'light') {
       return t('common.lightMode');
     } else if (theme === 'dark') {
@@ -121,24 +122,33 @@ export default function Settings({ language, onLanguageChange }: SettingsProps) 
               text: t('common.downloadUpdate'),
               onPress: async () => {
                 try {
-                  await Updates.fetchUpdateAsync();
-                  Alert.alert(
-                    t('common.updateDownloaded'),
-                    t('common.updateDownloadedMessage'),
-                    [
-                      {
-                        text: t('common.restartNow'),
-                        onPress: async () => {
-                          await Updates.reloadAsync();
+                  const result = await Updates.fetchUpdateAsync();
+                  if (result.isNew) {
+                    Alert.alert(
+                      t('common.updateDownloaded'),
+                      t('common.updateDownloadedMessage'),
+                      [
+                        {
+                          text: t('common.restartNow'),
+                          onPress: async () => {
+                            await Updates.reloadAsync();
+                          },
                         },
-                      },
-                      { text: t('common.later'), style: 'cancel' },
-                    ]
-                  );
+                        { text: t('common.later'), style: 'cancel' },
+                      ]
+                    );
+                  } else {
+                    Alert.alert(
+                      t('common.noUpdateAvailable'),
+                      t('common.noUpdateAvailableMessage'),
+                      [{ text: t('common.ok') }]
+                    );
+                  }
                 } catch (error) {
+                  console.error('Error fetching update:', error);
                   Alert.alert(
                     t('common.updateError'),
-                    t('common.updateErrorMessage'),
+                    `${t('common.updateErrorMessage')}\n\nError: ${error instanceof Error ? error.message : String(error)}`,
                     [{ text: t('common.ok') }]
                   );
                 }
@@ -154,9 +164,10 @@ export default function Settings({ language, onLanguageChange }: SettingsProps) 
         );
       }
     } catch (error) {
+      console.error('Error checking for update:', error);
       Alert.alert(
         t('common.updateError'),
-        t('common.updateErrorMessage'),
+        `${t('common.updateErrorMessage')}\n\nError: ${error instanceof Error ? error.message : String(error)}`,
         [{ text: t('common.ok') }]
       );
     } finally {
@@ -236,7 +247,7 @@ export default function Settings({ language, onLanguageChange }: SettingsProps) 
                       size={20}
                       color={isDark ? '#ffffff' : '#1e293b'}
                     />
-                    <Text style={styles.menuItemText}>{getThemeText()}</Text>
+                    <Text style={styles.themeText}>{getThemeText()}</Text>
                   </View>
                   <Ionicons
                     name="chevron-forward"
@@ -288,15 +299,19 @@ export default function Settings({ language, onLanguageChange }: SettingsProps) 
                 {whatsNewExpanded && (
                   <View style={styles.whatsNewContainer}>
                     <Text style={styles.whatsNewFeature}>
+                      <Text style={styles.newBadge}>(New) </Text>
                       {t('common.whatsNewFeature1')}
                     </Text>
                     <Text style={styles.whatsNewFeature}>
+                      <Text style={styles.newBadge}>(New) </Text>
                       {t('common.whatsNewFeature2')}
                     </Text>
                     <Text style={styles.whatsNewFeature}>
+                      <Text style={styles.newBadge}>(New) </Text>
                       {t('common.whatsNewFeature3')}
                     </Text>
                     <Text style={styles.whatsNewFeature}>
+                      <Text style={styles.newBadge}>(New) </Text>
                       {t('common.whatsNewFeature4')}
                     </Text>
                   </View>
@@ -444,6 +459,12 @@ function createStyles(isDark: boolean) {
       color: isDark ? '#ffffff' : '#1e293b',
       marginLeft: 12,
     },
+    themeText: {
+      fontSize: 16,
+      fontWeight: '500',
+      color: isDark ? '#3b82f6' : '#2563eb',
+      marginLeft: 12,
+    },
     versionText: {
       fontSize: 16,
       fontWeight: '600',
@@ -462,6 +483,11 @@ function createStyles(isDark: boolean) {
       color: isDark ? '#cbd5e1' : '#475569',
       marginBottom: 8,
       lineHeight: 20,
+    },
+    newBadge: {
+      fontSize: 13,
+      fontWeight: '700',
+      color: isDark ? '#3b82f6' : '#2563eb',
     },
   });
 }

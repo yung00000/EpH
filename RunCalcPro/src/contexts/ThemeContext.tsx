@@ -27,7 +27,12 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
-    updateIsDark();
+    // Update isDark based on current theme and system color scheme
+    if (theme === 'automatic') {
+      setIsDark(systemColorScheme === 'dark');
+    } else {
+      setIsDark(theme === 'dark');
+    }
   }, [theme, systemColorScheme]);
 
   const loadSavedTheme = async () => {
@@ -37,18 +42,11 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const updateIsDark = () => {
-    if (theme === 'automatic') {
-      setIsDark(systemColorScheme === 'dark');
-    } else {
-      setIsDark(theme === 'dark');
-    }
-  };
-
   const setTheme = async (newTheme: Theme) => {
     setThemeState(newTheme);
     await saveTheme(newTheme);
-    updateIsDark();
+    // Don't call updateIsDark() here - let the useEffect handle it
+    // when theme state updates
   };
 
   const toggleTheme = async () => {
