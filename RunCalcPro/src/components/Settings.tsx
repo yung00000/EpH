@@ -81,7 +81,7 @@ export default function Settings({ language, onLanguageChange }: SettingsProps) 
       [
         { text: t('common.cancel'), style: 'cancel' },
         {
-          text: t('common.copied'),
+          text: t('common.copy'),
           onPress: async () => {
             await Clipboard.setStringAsync(email);
             Alert.alert(
@@ -216,9 +216,6 @@ export default function Settings({ language, onLanguageChange }: SettingsProps) 
             <ScrollView style={styles.modalBody} showsVerticalScrollIndicator={false}>
               {/* Language Switching */}
               <View style={styles.menuSection}>
-                <Text style={styles.menuSectionTitle}>
-                  {t('common.switchLanguage')}
-                </Text>
                 <View style={styles.menuItem}>
                   <LanguageSwitcher
                     language={currentLanguage}
@@ -229,9 +226,6 @@ export default function Settings({ language, onLanguageChange }: SettingsProps) 
 
               {/* Dark/Light Mode */}
               <View style={styles.menuSection}>
-                <Text style={styles.menuSectionTitle}>
-                  {t('common.switchTheme')}
-                </Text>
                 <TouchableOpacity
                   style={styles.menuItem}
                   onPress={handleThemeChange}
@@ -254,9 +248,6 @@ export default function Settings({ language, onLanguageChange }: SettingsProps) 
 
               {/* App Version Info */}
               <View style={styles.menuSection}>
-                <Text style={styles.menuSectionTitle}>
-                  {t('common.appInformation')}
-                </Text>
                 <View style={styles.menuItem}>
                   <View style={styles.menuItemContent}>
                     <Ionicons
@@ -274,9 +265,6 @@ export default function Settings({ language, onLanguageChange }: SettingsProps) 
 
               {/* What's New */}
               <View style={styles.menuSection}>
-                <Text style={styles.menuSectionTitle}>
-                  {t('common.whatsNew')}
-                </Text>
                 <TouchableOpacity
                   style={styles.menuItem}
                   onPress={() => setWhatsNewExpanded(!whatsNewExpanded)}
@@ -317,9 +305,6 @@ export default function Settings({ language, onLanguageChange }: SettingsProps) 
 
               {/* Check for Updates */}
               <View style={styles.menuSection}>
-                <Text style={styles.menuSectionTitle}>
-                  {t('common.updates')}
-                </Text>
                 <TouchableOpacity
                   style={styles.menuItem}
                   onPress={handleCheckForUpdate}
