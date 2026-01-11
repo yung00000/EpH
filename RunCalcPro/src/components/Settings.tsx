@@ -24,7 +24,7 @@ import { Language } from '../types';
 import { saveLanguage } from '../utils/storage';
 import Constants from 'expo-constants';
 // App version from app.json
-const APP_VERSION = Constants.expoConfig?.version || '1.2.0';
+const APP_VERSION = Constants.expoConfig?.version || '1.2.3';
 
 interface SettingsProps {
   language: Language;

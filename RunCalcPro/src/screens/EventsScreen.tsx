@@ -46,13 +46,31 @@ export default function EventsScreen() {
 
   const styles = createStyles(isDark);
 
+  // Handle distance input - only allow numbers and decimal point
+  const handleDistanceChange = (text: string) => {
+    // Remove any non-numeric characters except decimal point
+    const numericText = text.replace(/[^0-9.]/g, '');
+    // Ensure only one decimal point
+    const parts = numericText.split('.');
+    const filteredText = parts.length > 2 
+      ? parts[0] + '.' + parts.slice(1).join('')
+      : numericText;
+    setEventDistance(filteredText);
+  };
+
   useEffect(() => {
     loadEvents();
   }, []);
 
   const loadEvents = async () => {
     const eventsData = await loadRaceEvents();
-    setEvents(eventsData);
+    // Sort events by date (nearest to farthest - ascending order)
+    const sortedEvents = [...eventsData].sort((a, b) => {
+      const dateA = new Date(a.date).getTime();
+      const dateB = new Date(b.date).getTime();
+      return dateA - dateB; // Ascending: earliest dates first
+    });
+    setEvents(sortedEvents);
   };
 
   // Calculate days until event
@@ -137,7 +155,11 @@ export default function EventsScreen() {
         </TouchableOpacity>
       </View>
 
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+      <ScrollView 
+        style={styles.scrollView} 
+        contentContainerStyle={styles.scrollViewContent}
+        showsVerticalScrollIndicator={false}
+      >
         {/* Upcoming Event */}
         {upcomingEvent && daysUntil !== null && (
           <View style={styles.upcomingEventCard}>
@@ -276,7 +298,7 @@ export default function EventsScreen() {
                     <TextInput
                       style={styles.input}
                       value={eventDistance}
-                      onChangeText={setEventDistance}
+                      onChangeText={handleDistanceChange}
                       placeholder={t('common.eventDistancePlaceholder')}
                       keyboardType="decimal-pad"
                       placeholderTextColor={isDark ? '#94a3b8' : '#64748b'}
@@ -453,6 +475,9 @@ function createStyles(isDark: boolean) {
     },
     scrollView: {
       flex: 1,
+    },
+    scrollViewContent: {
+      paddingBottom: 32,
     },
     upcomingEventCard: {
       backgroundColor: isDark ? '#1e293b' : '#ffffff',
