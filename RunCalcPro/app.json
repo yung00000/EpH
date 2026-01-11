@@ -35,7 +35,8 @@
     "updates": {
       "enabled": true,
       "checkAutomatically": "ON_LOAD",
-      "fallbackToCacheTimeout": 0
+      "fallbackToCacheTimeout": 0,
+      "url": "https://u.expo.dev/71a0d103-c75d-42f9-8b9b-44bc1f8fe109"
     },
     "runtimeVersion": {
       "policy": "appVersion"
@@ -44,6 +45,9 @@
       "eas": {
         "projectId": "71a0d103-c75d-42f9-8b9b-44bc1f8fe109"
       }
-    }
+    },
+    "plugins": [
+      "@react-native-community/datetimepicker"
+    ]
   }
 }
