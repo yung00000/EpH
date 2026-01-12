@@ -146,11 +146,26 @@ export default function Settings({ language, onLanguageChange }: SettingsProps) 
                   }
                 } catch (error) {
                   console.error('Error fetching update:', error);
-                  Alert.alert(
-                    t('common.updateError'),
-                    `${t('common.updateErrorMessage')}\n\nError: ${error instanceof Error ? error.message : String(error)}`,
-                    [{ text: t('common.ok') }]
-                  );
+                  // More user-friendly error message
+                  const errorMessage = error instanceof Error 
+                    ? error.message.toLowerCase()
+                    : String(error).toLowerCase();
+                  
+                  // Check for specific error types
+                  if (errorMessage.includes('network') || errorMessage.includes('fetch')) {
+                    Alert.alert(
+                      t('common.updateError'),
+                      t('common.updateNetworkError'),
+                      [{ text: t('common.ok') }]
+                    );
+                  } else {
+                    // Generic error - show simplified message
+                    Alert.alert(
+                      t('common.updateError'),
+                      t('common.updateErrorMessage'),
+                      [{ text: t('common.ok') }]
+                    );
+                  }
                 }
               },
             },
@@ -165,11 +180,34 @@ export default function Settings({ language, onLanguageChange }: SettingsProps) 
       }
     } catch (error) {
       console.error('Error checking for update:', error);
-      Alert.alert(
-        t('common.updateError'),
-        `${t('common.updateErrorMessage')}\n\nError: ${error instanceof Error ? error.message : String(error)}`,
-        [{ text: t('common.ok') }]
-      );
+      
+      // More user-friendly error handling
+      const errorMessage = error instanceof Error 
+        ? error.message.toLowerCase()
+        : String(error).toLowerCase();
+      
+      // Check for specific error types
+      if (errorMessage.includes('rejected') || errorMessage.includes('not available')) {
+        // Updates service not available or rejected - show friendly message
+        Alert.alert(
+          t('common.updateNotAvailable'),
+          t('common.updateServiceUnavailable'),
+          [{ text: t('common.ok') }]
+        );
+      } else if (errorMessage.includes('network') || errorMessage.includes('fetch')) {
+        Alert.alert(
+          t('common.updateError'),
+          t('common.updateNetworkError'),
+          [{ text: t('common.ok') }]
+        );
+      } else {
+        // Generic error - show simplified message without technical details
+        Alert.alert(
+          t('common.updateError'),
+          t('common.updateErrorMessage'),
+          [{ text: t('common.ok') }]
+        );
+      }
     } finally {
       setIsCheckingUpdate(false);
       setUpdateAvailable(false);

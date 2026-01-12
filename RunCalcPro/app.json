@@ -48,7 +48,6 @@
     },
     "plugins": [
       "@react-native-community/datetimepicker",
-      "@logrocket/react-native",
       "expo-build-properties"
     ]
   }

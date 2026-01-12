@@ -201,6 +201,10 @@ export default function EventsScreen() {
                 </TouchableOpacity>
               );
 
+              const daysUntil = getDaysUntilEvent(event.date);
+              const isPast = daysUntil < 0;
+              const isToday = daysUntil === 0;
+
               return (
                 <Swipeable
                   key={event.id}
@@ -210,10 +214,17 @@ export default function EventsScreen() {
                   <View style={styles.eventCard}>
                     <View style={styles.eventCardContent}>
                       <Text style={styles.eventCardName}>{event.eventName}</Text>
-                      <Text style={styles.eventCardDetail}>
-                        {event.date} • {getEventTypeDisplayName(event.type)}
-                        {event.distance ? ` • ${event.distance} km` : ''}
-                      </Text>
+                      <View style={styles.eventCardRow}>
+                        {!isPast && (
+                          <Text style={styles.eventCardDays}>
+                            {isToday ? t('common.today') : `${daysUntil} ${t('common.daysUntil')}`}
+                          </Text>
+                        )}
+                        <Text style={styles.eventCardDetail}>
+                          {formatEventDate(event.date)} • {getEventTypeDisplayName(event.type)}
+                          {event.distance ? ` • ${event.distance} km` : ''}
+                        </Text>
+                      </View>
                     </View>
                   </View>
                 </Swipeable>
@@ -544,9 +555,20 @@ function createStyles(isDark: boolean) {
       color: isDark ? '#ffffff' : '#1e293b',
       marginBottom: 8,
     },
+    eventCardRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    eventCardDays: {
+      fontSize: 14,
+      fontWeight: '600',
+      color: isDark ? '#3b82f6' : '#2563eb',
+      marginRight: 8,
+    },
     eventCardDetail: {
       fontSize: 14,
       color: isDark ? '#94a3b8' : '#64748b',
+      flex: 1,
     },
     deleteAction: {
       backgroundColor: '#ef4444',
