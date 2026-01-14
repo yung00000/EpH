@@ -1,6 +1,42 @@
 # Changelog
 
-## Version 1.2.1 (Current)
+## Version 1.2.3 (Current)
+
+### UI Improvements
+
+#### EpH Calculator Enhancements
+- ✅ **Updated Calculator Layout**: Improved visual hierarchy and consistency
+  - Added "Calculate" title above mode selection buttons
+  - Changed button labels: "Calculate EpH" → "EpH", "Calculate Estimated Time" → "Estimated Time"
+  - Title formatting matches label styles (font size and weight)
+  - Left-aligned "Calculate" title for better consistency
+
+#### Events Management Enhancements
+- ✅ **Enhanced Event Types**: Added new event categorization system
+  - New Type field: Race, Training, Event (with Training as default)
+  - Renamed previous Type field to Distance: 5KM, 10KM, Half Marathon, Marathon, Trail Run, Other
+  - Custom distance input for Trail Run and Other types
+  - Event notes field for Event type (optional text input)
+  - Distance field optional when Type is "Event" and Distance is "Other"
+- ✅ **Past Events Screen**: Separate page for historical events
+  - Dedicated screen to view all past events
+  - Accessible via "View Past" button on Events screen
+  - Past events sorted by most recent first
+  - Swipe-to-delete functionality maintained
+- ✅ **Improved Date Display**: Enhanced date formatting
+  - Dates now include day of week: "DD MMM YY (Day)" format
+  - Example: "16 Jan 26 (Thu)", "8 Apr 26 (Wed)"
+  - Applied to both upcoming and past events
+
+### Technical Improvements
+- ✅ Updated navigation stack to include PastEvents screen
+- ✅ Enhanced event filtering logic (upcoming vs past events)
+- ✅ Improved form validation for conditional fields
+- ✅ Auto-refresh events when returning from Past Events screen
+
+---
+
+## Version 1.2.1
 
 ### New Features
 

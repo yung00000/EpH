@@ -408,6 +408,7 @@ export default function EpHCalculatorScreen() {
       >
         <View style={styles.card}>
           <View style={styles.formGroup}>
+            <Text style={styles.calculateTitle}>{t('eph.calculateTitle')}</Text>
             <View style={styles.modeContainer}>
               <TouchableOpacity
                 style={[styles.modeButton, mode === 'eph' ? styles.modeButtonActive : null]}
@@ -867,6 +868,13 @@ function createStyles(isDark: boolean) {
       padding: 12,
       fontSize: 16,
       color: isDark ? '#ffffff' : '#1e293b',
+    },
+    calculateTitle: {
+      fontSize: 14,
+      fontWeight: '500',
+      color: isDark ? '#ffffff' : '#1e293b',
+      marginBottom: 8,
+      textAlign: 'left',
     },
     modeContainer: {
       flexDirection: 'row',

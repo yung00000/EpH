@@ -18,7 +18,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Swipeable } from 'react-native-gesture-handler';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import type { StackNavigationProp } from '@react-navigation/stack';
+import type { RootStackParamList } from '../navigation/AppNavigator';
 import { useTheme } from '../contexts/ThemeContext';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import {
@@ -29,25 +31,30 @@ import {
 } from '../utils/storage';
 import '../i18n/i18nConfig';
 
+type NavigationProp = StackNavigationProp<RootStackParamList>;
+
 export default function EventsScreen() {
   const { t } = useTranslation();
   const { isDark } = useTheme();
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProp>();
 
   const [events, setEvents] = useState<RaceEvent[]>([]);
   const [eventName, setEventName] = useState('');
   const [eventDate, setEventDate] = useState('');
   const [eventDateValue, setEventDateValue] = useState<Date>(new Date());
   const [showEventDatePicker, setShowEventDatePicker] = useState(false);
-  const [eventType, setEventType] = useState<'5KM' | '10KM' | 'Half Marathon' | 'Marathon' | 'Trail Run' | 'Other'>('5KM');
-  const [eventDistance, setEventDistance] = useState('');
+  const [eventType, setEventType] = useState<'Race' | 'Training' | 'Event'>('Training');
+  const [eventDistance, setEventDistance] = useState<'5KM' | '10KM' | 'Half Marathon' | 'Marathon' | 'Trail Run' | 'Other'>('5KM');
+  const [customDistance, setCustomDistance] = useState('');
+  const [eventNotes, setEventNotes] = useState('');
   const [showEventTypePicker, setShowEventTypePicker] = useState(false);
+  const [showEventDistancePicker, setShowEventDistancePicker] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
 
   const styles = createStyles(isDark);
 
-  // Handle distance input - only allow numbers and decimal point
-  const handleDistanceChange = (text: string) => {
+  // Handle custom distance input - only allow numbers and decimal point
+  const handleCustomDistanceChange = (text: string) => {
     // Remove any non-numeric characters except decimal point
     const numericText = text.replace(/[^0-9.]/g, '');
     // Ensure only one decimal point
@@ -55,22 +62,39 @@ export default function EventsScreen() {
     const filteredText = parts.length > 2 
       ? parts[0] + '.' + parts.slice(1).join('')
       : numericText;
-    setEventDistance(filteredText);
+    setCustomDistance(filteredText);
   };
 
   useEffect(() => {
     loadEvents();
   }, []);
 
+  // Reload events when screen comes into focus (e.g., returning from Past Events)
+  useFocusEffect(
+    React.useCallback(() => {
+      loadEvents();
+    }, [])
+  );
+
   const loadEvents = async () => {
     const eventsData = await loadRaceEvents();
-    // Sort events by date (nearest to farthest - ascending order)
-    const sortedEvents = [...eventsData].sort((a, b) => {
-      const dateA = new Date(a.date).getTime();
-      const dateB = new Date(b.date).getTime();
-      return dateA - dateB; // Ascending: earliest dates first
-    });
-    setEvents(sortedEvents);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    // Filter only upcoming events (today and future) and sort by date (nearest to farthest - ascending order)
+    const upcomingEvents = eventsData
+      .filter(event => {
+        const eventDate = new Date(event.date);
+        eventDate.setHours(0, 0, 0, 0);
+        return eventDate >= today;
+      })
+      .sort((a, b) => {
+        const dateA = new Date(a.date).getTime();
+        const dateB = new Date(b.date).getTime();
+        return dateA - dateB; // Ascending: earliest dates first
+      });
+    
+    setEvents(upcomingEvents);
   };
 
   // Calculate days until event
@@ -107,33 +131,49 @@ export default function EventsScreen() {
   const upcomingEvent = getUpcomingEvent();
   const daysUntil = upcomingEvent ? getDaysUntilEvent(upcomingEvent.date) : null;
 
-  // Format date as "DD MMM YY"
+  // Format date as "DD MMM YY (Day)"
   const formatEventDate = (dateString: string): string => {
     const date = new Date(dateString);
     const day = String(date.getDate()).padStart(2, '0');
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     const month = months[date.getMonth()];
     const year = String(date.getFullYear()).slice(-2);
-    return `${day} ${month} ${year}`;
+    const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const dayOfWeek = daysOfWeek[date.getDay()];
+    return `${day} ${month} ${year} (${dayOfWeek})`;
   };
 
-  // Get event type display name
-  const getEventTypeDisplayName = (type: string): string => {
+  // Get event type display name (Race/Training/Event)
+  const getEventTypeDisplayName = (type: 'Race' | 'Training' | 'Event'): string => {
     switch (type) {
-      case '5KM':
-        return t('common.eventType5KM');
-      case '10KM':
-        return t('common.eventType10KM');
-      case 'Half Marathon':
-        return t('common.eventTypeHalfMarathon');
-      case 'Marathon':
-        return t('common.eventTypeMarathon');
-      case 'Trail Run':
-        return t('common.eventTypeTrailRun');
-      case 'Other':
-        return t('common.eventTypeOther');
+      case 'Race':
+        return t('common.eventTypeRace');
+      case 'Training':
+        return t('common.eventTypeTraining');
+      case 'Event':
+        return t('common.eventTypeEvent');
       default:
         return type;
+    }
+  };
+
+  // Get event distance display name
+  const getEventDistanceDisplayName = (distance: string): string => {
+    switch (distance) {
+      case '5KM':
+        return t('common.eventDistance5KM');
+      case '10KM':
+        return t('common.eventDistance10KM');
+      case 'Half Marathon':
+        return t('common.eventDistanceHalfMarathon');
+      case 'Marathon':
+        return t('common.eventDistanceMarathon');
+      case 'Trail Run':
+        return t('common.eventDistanceTrailRun');
+      case 'Other':
+        return t('common.eventDistanceOther');
+      default:
+        return distance;
     }
   };
 
@@ -173,14 +213,24 @@ export default function EventsScreen() {
               </Text>
             </View>
             <Text style={styles.upcomingEventType}>
-              {getEventTypeDisplayName(upcomingEvent.type)}
+              {getEventTypeDisplayName(upcomingEvent.type)} • {getEventDistanceDisplayName(upcomingEvent.distance)}
+              {upcomingEvent.customDistance ? ` • ${upcomingEvent.customDistance} km` : ''}
+              {upcomingEvent.eventNotes ? ` • ${upcomingEvent.eventNotes}` : ''}
             </Text>
           </View>
         )}
 
         {/* Events List */}
         <View style={styles.eventsList}>
-          <Text style={styles.eventsListTitle}>{t('common.eventsTitle')}</Text>
+          <View style={styles.eventsListHeader}>
+            <Text style={styles.eventsListTitle}>{t('common.upcomingEvents')}</Text>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('PastEvents')}
+              style={styles.viewPastButton}
+            >
+              <Text style={styles.viewPastButtonText}>{t('common.viewPastEvents')}</Text>
+            </TouchableOpacity>
+          </View>
           {events.length === 0 ? (
             <Text style={styles.noEventsText}>{t('common.noEvents')}</Text>
           ) : (
@@ -202,7 +252,6 @@ export default function EventsScreen() {
               );
 
               const daysUntil = getDaysUntilEvent(event.date);
-              const isPast = daysUntil < 0;
               const isToday = daysUntil === 0;
 
               return (
@@ -213,18 +262,17 @@ export default function EventsScreen() {
                 >
                   <View style={styles.eventCard}>
                     <View style={styles.eventCardContent}>
-                      <Text style={styles.eventCardName}>{event.eventName}</Text>
                       <View style={styles.eventCardRow}>
-                        {!isPast && (
-                          <Text style={styles.eventCardDays}>
-                            {isToday ? t('common.today') : `${daysUntil} ${t('common.daysUntil')}`}
-                          </Text>
-                        )}
-                        <Text style={styles.eventCardDetail}>
-                          {formatEventDate(event.date)} • {getEventTypeDisplayName(event.type)}
-                          {event.distance ? ` • ${event.distance} km` : ''}
+                        <Text style={styles.eventCardName}>{event.eventName}</Text>
+                        <Text style={styles.eventCardDays}>
+                          {isToday ? t('common.today') : `${daysUntil} ${t('common.daysUntil')}`}
                         </Text>
                       </View>
+                      <Text style={styles.eventCardDetail}>
+                        {formatEventDate(event.date)} • {getEventTypeDisplayName(event.type)} • {getEventDistanceDisplayName(event.distance)}
+                        {event.customDistance ? ` • ${event.customDistance} km` : ''}
+                        {event.eventNotes ? ` • ${event.eventNotes}` : ''}
+                      </Text>
                     </View>
                   </View>
                 </Swipeable>
@@ -304,12 +352,37 @@ export default function EventsScreen() {
                   </TouchableOpacity>
                 </View>
 
-                {(eventType === 'Trail Run' || eventType === 'Other') && (
+                <View style={styles.formGroup}>
+                  <TouchableOpacity
+                    style={styles.input}
+                    onPress={() => setShowEventDistancePicker(true)}
+                  >
+                    <Text style={{ color: isDark ? '#ffffff' : '#1e293b', fontSize: 16 }}>
+                      {getEventDistanceDisplayName(eventDistance)}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+
+                {eventType === 'Event' && (
                   <View style={styles.formGroup}>
                     <TextInput
                       style={styles.input}
-                      value={eventDistance}
-                      onChangeText={handleDistanceChange}
+                      value={eventNotes}
+                      onChangeText={setEventNotes}
+                      placeholder={t('common.eventNotesPlaceholder')}
+                      multiline
+                      numberOfLines={3}
+                      placeholderTextColor={isDark ? '#94a3b8' : '#64748b'}
+                    />
+                  </View>
+                )}
+
+                {(eventDistance === 'Trail Run' || eventDistance === 'Other') && (
+                  <View style={styles.formGroup}>
+                    <TextInput
+                      style={styles.input}
+                      value={customDistance}
+                      onChangeText={handleCustomDistanceChange}
                       placeholder={t('common.eventDistancePlaceholder')}
                       keyboardType="decimal-pad"
                       placeholderTextColor={isDark ? '#94a3b8' : '#64748b'}
@@ -328,7 +401,8 @@ export default function EventsScreen() {
                       Alert.alert('', t('common.eventDateRequired'));
                       return;
                     }
-                    if ((eventType === 'Trail Run' || eventType === 'Other') && !eventDistance.trim()) {
+                    // Distance is required for Trail Run and Other, except when Type is Event
+                    if ((eventDistance === 'Trail Run' || eventDistance === 'Other') && !customDistance.trim() && eventType !== 'Event') {
                       Alert.alert('', t('common.eventDistanceRequired'));
                       return;
                     }
@@ -337,13 +411,17 @@ export default function EventsScreen() {
                         eventName: eventName.trim(),
                         date: eventDate.trim(),
                         type: eventType,
-                        distance: (eventType === 'Trail Run' || eventType === 'Other') ? eventDistance.trim() : undefined,
+                        distance: eventDistance,
+                        customDistance: (eventDistance === 'Trail Run' || eventDistance === 'Other') ? customDistance.trim() : undefined,
+                        eventNotes: eventType === 'Event' ? eventNotes.trim() : undefined,
                       });
                       setEventName('');
                       setEventDate('');
                       setEventDateValue(new Date());
-                      setEventType('5KM');
-                      setEventDistance('');
+                      setEventType('Training');
+                      setEventDistance('5KM');
+                      setCustomDistance('');
+                      setEventNotes('');
                       setShowAddForm(false);
                       await loadEvents();
                     } catch (error) {
@@ -359,7 +437,7 @@ export default function EventsScreen() {
         </View>
       </Modal>
 
-      {/* Type Picker Modal */}
+      {/* Type Picker Modal (Race/Training/Event) */}
       <Modal
         visible={showEventTypePicker}
         transparent
@@ -377,60 +455,107 @@ export default function EventsScreen() {
               <TouchableOpacity
                 style={styles.typePickerOptionModal}
                 onPress={() => {
-                  setEventType('5KM');
-                  setEventDistance('');
+                  setEventType('Training');
                   setShowEventTypePicker(false);
                 }}
               >
-                <Text style={styles.typePickerOptionText}>{t('common.eventType5KM')}</Text>
+                <Text style={styles.typePickerOptionText}>{t('common.eventTypeTraining')}</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.typePickerOptionModal}
                 onPress={() => {
-                  setEventType('10KM');
-                  setEventDistance('');
+                  setEventType('Race');
                   setShowEventTypePicker(false);
                 }}
               >
-                <Text style={styles.typePickerOptionText}>{t('common.eventType10KM')}</Text>
+                <Text style={styles.typePickerOptionText}>{t('common.eventTypeRace')}</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.typePickerOptionModal}
                 onPress={() => {
-                  setEventType('Half Marathon');
-                  setEventDistance('');
+                  setEventType('Event');
                   setShowEventTypePicker(false);
                 }}
               >
-                <Text style={styles.typePickerOptionText}>{t('common.eventTypeHalfMarathon')}</Text>
+                <Text style={styles.typePickerOptionText}>{t('common.eventTypeEvent')}</Text>
+              </TouchableOpacity>
+            </ScrollView>
+          </View>
+        </TouchableOpacity>
+      </Modal>
+
+      {/* Distance Picker Modal */}
+      <Modal
+        visible={showEventDistancePicker}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowEventDistancePicker(false)}
+      >
+        <TouchableOpacity
+          style={styles.modalOverlay}
+          activeOpacity={1}
+          onPress={() => setShowEventDistancePicker(false)}
+        >
+          <View style={styles.typePickerModal}>
+            <Text style={styles.typePickerTitle}>{t('common.eventDistance')}</Text>
+            <ScrollView showsVerticalScrollIndicator={false}>
+              <TouchableOpacity
+                style={styles.typePickerOptionModal}
+                onPress={() => {
+                  setEventDistance('5KM');
+                  setCustomDistance('');
+                  setShowEventDistancePicker(false);
+                }}
+              >
+                <Text style={styles.typePickerOptionText}>{t('common.eventDistance5KM')}</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.typePickerOptionModal}
                 onPress={() => {
-                  setEventType('Marathon');
-                  setEventDistance('');
-                  setShowEventTypePicker(false);
+                  setEventDistance('10KM');
+                  setCustomDistance('');
+                  setShowEventDistancePicker(false);
                 }}
               >
-                <Text style={styles.typePickerOptionText}>{t('common.eventTypeMarathon')}</Text>
+                <Text style={styles.typePickerOptionText}>{t('common.eventDistance10KM')}</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.typePickerOptionModal}
                 onPress={() => {
-                  setEventType('Trail Run');
-                  setShowEventTypePicker(false);
+                  setEventDistance('Half Marathon');
+                  setCustomDistance('');
+                  setShowEventDistancePicker(false);
                 }}
               >
-                <Text style={styles.typePickerOptionText}>{t('common.eventTypeTrailRun')}</Text>
+                <Text style={styles.typePickerOptionText}>{t('common.eventDistanceHalfMarathon')}</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.typePickerOptionModal}
                 onPress={() => {
-                  setEventType('Other');
-                  setShowEventTypePicker(false);
+                  setEventDistance('Marathon');
+                  setCustomDistance('');
+                  setShowEventDistancePicker(false);
                 }}
               >
-                <Text style={styles.typePickerOptionText}>{t('common.eventTypeOther')}</Text>
+                <Text style={styles.typePickerOptionText}>{t('common.eventDistanceMarathon')}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.typePickerOptionModal}
+                onPress={() => {
+                  setEventDistance('Trail Run');
+                  setShowEventDistancePicker(false);
+                }}
+              >
+                <Text style={styles.typePickerOptionText}>{t('common.eventDistanceTrailRun')}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.typePickerOptionModal}
+                onPress={() => {
+                  setEventDistance('Other');
+                  setShowEventDistancePicker(false);
+                }}
+              >
+                <Text style={styles.typePickerOptionText}>{t('common.eventDistanceOther')}</Text>
               </TouchableOpacity>
             </ScrollView>
           </View>
@@ -530,11 +655,27 @@ function createStyles(isDark: boolean) {
     eventsList: {
       padding: 16,
     },
+    eventsListHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: 16,
+    },
     eventsListTitle: {
       fontSize: 18,
       fontWeight: '600',
       color: isDark ? '#ffffff' : '#1e293b',
-      marginBottom: 16,
+    },
+    viewPastButton: {
+      paddingHorizontal: 12,
+      paddingVertical: 6,
+      borderRadius: 8,
+      backgroundColor: isDark ? '#334155' : '#e2e8f0',
+    },
+    viewPastButtonText: {
+      fontSize: 14,
+      fontWeight: '500',
+      color: isDark ? '#94a3b8' : '#64748b',
     },
     eventCard: {
       flexDirection: 'row',
@@ -549,26 +690,26 @@ function createStyles(isDark: boolean) {
     eventCardContent: {
       flex: 1,
     },
+    eventCardRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      marginBottom: 8,
+    },
     eventCardName: {
       fontSize: 16,
       fontWeight: '600',
       color: isDark ? '#ffffff' : '#1e293b',
-      marginBottom: 8,
-    },
-    eventCardRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
+      flex: 1,
     },
     eventCardDays: {
       fontSize: 14,
       fontWeight: '600',
       color: isDark ? '#3b82f6' : '#2563eb',
-      marginRight: 8,
     },
     eventCardDetail: {
       fontSize: 14,
       color: isDark ? '#94a3b8' : '#64748b',
-      flex: 1,
     },
     deleteAction: {
       backgroundColor: '#ef4444',

@@ -329,8 +329,10 @@ export interface RaceEvent {
   id: string;
   eventName: string;
   date: string;
-  type: '5KM' | '10KM' | 'Half Marathon' | 'Marathon' | 'Trail Run' | 'Other';
-  distance?: string; // Optional, only required for Trail Run and Other
+  type: 'Race' | 'Training' | 'Event';
+  distance: '5KM' | '10KM' | 'Half Marathon' | 'Marathon' | 'Trail Run' | 'Other';
+  customDistance?: string; // Optional, only required for Trail Run and Other
+  eventNotes?: string; // Optional, for Event type to add additional notes/description
   createdAt: string;
 }
 

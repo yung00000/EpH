@@ -8,12 +8,14 @@ import { createStackNavigator } from '@react-navigation/stack';
 import EpHCalculatorScreen from '../screens/EpHCalculatorScreen';
 import TrackCalculatorScreen from '../screens/TrackCalculatorScreen';
 import EventsScreen from '../screens/EventsScreen';
+import PastEventsScreen from '../screens/PastEventsScreen';
 import { useTranslation } from 'react-i18next';
 
 export type RootStackParamList = {
   EpHCalculator: undefined;
   TrackCalculator: undefined;
   Events: undefined;
+  PastEvents: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -55,6 +57,14 @@ export default function AppNavigator() {
         component={EventsScreen}
         options={{
           title: t('common.eventsTitle'),
+          headerShown: false, // We have custom header in screens
+        }}
+      />
+      <Stack.Screen
+        name="PastEvents"
+        component={PastEventsScreen}
+        options={{
+          title: t('common.pastEventsTitle'),
           headerShown: false, // We have custom header in screens
         }}
       />
